@@ -25,6 +25,27 @@ export default {async fetch(req:Request,env:Env):Promise<Response>{
   const record=await env.DB.prepare('SELECT key_hash,status FROM partners WHERE id=?').bind(partnerId).first<{key_hash:string;status:string}>();
   return !!record&&record.status==='APPROVED'&&record.key_hash===await sha(key);
  }
+ // Allow only the holder of the original demo device to read that device's audit trail.
+ if(path==='/api/user/access-history'&&req.method==='GET'){
+  const deviceId=safeText(req.headers.get('X-Demo-Device'),60);
+  if(!/^[a-f0-9-]{36}$/i.test(deviceId))return fail('Demo device ID required',401);
+  const deviceHash=await sha(deviceId);
+  const rows=await env.DB.prepare(`SELECT a.event_type,a.rental_id,a.at,r.item
+    FROM audit_events a JOIN rental_requests r ON r.id=a.rental_id
+    JOIN guarantee_tokens t ON t.rental_id=r.id
+    WHERE t.holder_pseudonym=? AND a.event_type IN
+      ('DEMO_IDENTITY_VIEWED','DISCLOSURE_REQUESTED','DISCLOSURE_APPROVED_FOR_REVIEW','DISCLOSURE_REJECTED')
+    ORDER BY a.at DESC LIMIT 100`).bind(deviceHash).all();
+  // Include previously approved/rejected reviews created before decision audits included rental IDs.
+  const decisions=await env.DB.prepare(`SELECT d.rental_id,r.item,d.status,d.reviewed_at AS at
+    FROM disclosure_requests d JOIN rental_requests r ON r.id=d.rental_id
+    JOIN guarantee_tokens t ON t.rental_id=r.id
+    WHERE t.holder_pseudonym=? AND d.reviewed_at IS NOT NULL AND d.status IN ('APPROVED_FOR_REVIEW','REJECTED')
+    ORDER BY d.reviewed_at DESC LIMIT 100`).bind(deviceHash).all();
+  const merged=[...(rows.results||[]),...(decisions.results||[]).map((x:any)=>({event_type:x.status==='REJECTED'?'DISCLOSURE_REJECTED':'DISCLOSURE_APPROVED_FOR_REVIEW',rental_id:x.rental_id,item:x.item,at:x.at}))];
+  const unique=new Map<string,any>();for(const e of merged){unique.set([e.event_type,e.rental_id,e.at].join('|'),e)}
+  return Response.json({events:[...unique.values()].sort((a,b)=>String(b.at).localeCompare(String(a.at))).slice(0,100),simulation:true});
+ }
  if(path==='/api/admin/partners'&&req.method==='GET'){
   if(!adminOK)return fail('Unauthorized',401);
   const rows=await env.DB.prepare('SELECT id,name,status,created_at,approved_at FROM partners ORDER BY created_at DESC LIMIT 100').all();
@@ -81,7 +102,7 @@ export default {async fetch(req:Request,env:Env):Promise<Response>{
   if(!['APPROVED_FOR_REVIEW','REJECTED'].includes(decision))return fail('Invalid decision');
   const result=await env.DB.prepare("UPDATE disclosure_requests SET status=?,reviewed_at=? WHERE id=? AND status='PENDING_REVIEW'").bind(decision,now(),id).run();
   if(result.meta.changes!==1)return fail('Pending case not found',409);
-  await audit(env.DB,'DISCLOSURE_'+decision,null,id+'; no personal data released');
+  const caseRow=await env.DB.prepare('SELECT rental_id FROM disclosure_requests WHERE id=?').bind(id).first<{rental_id:string}>();await audit(env.DB,'DISCLOSURE_'+decision,caseRow?.rental_id||null,id+'; no personal data released');
   return Response.json({case_id:id,status:decision,personal_data_released:false});
  }
  // Demonstration-only identity reveal: fictitious profiles, never actual mobile ID data.
