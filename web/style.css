@@ -244,3 +244,12 @@ footer{padding-bottom:112px!important}
 .check input[type="checkbox"]:checked::after{content:"";display:block;width:7px;height:12px;border:solid white;border-width:0 3px 3px 0;transform:rotate(45deg) translate(-1px,-1px)}
 .check input[type="checkbox"]:focus-visible{outline:3px solid #aac6ff;outline-offset:3px}
 .check span{flex:1;min-width:0;line-height:1.65;word-break:keep-all;overflow-wrap:break-word}
+
+/* v0.7: synthetic identity review, clearly labeled demo */
+.demo-identity-panel{grid-column:1/-1;background:#eef8f4;border:1px solid #c6e6d6;border-radius:18px;padding:20px;margin-top:8px;min-width:0}
+.demo-identity-panel>strong{display:block;font-size:17px;color:#126348;margin-bottom:10px}
+.demo-identity-panel p{margin:0 0 14px;font-size:13px;color:#396858;line-height:1.6}
+.demo-identity-panel dl{display:grid;grid-template-columns:minmax(76px,110px) minmax(0,1fr);gap:11px 14px;margin:0 0 14px}
+.demo-identity-panel dt{font-size:13px;color:#607b70}.demo-identity-panel dd{margin:0;font-size:14px;color:#1d4436;overflow-wrap:anywhere}
+.demo-identity-panel small{display:block;color:#60796e;line-height:1.6}
+.partner-entry-actions{flex-wrap:wrap}.partner-entry-actions .demo-reveal-btn{background:#dbf5e8!important;color:#12664a!important;border-color:#bce5d0!important}
