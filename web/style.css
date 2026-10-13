@@ -150,3 +150,35 @@ footer{padding-bottom:112px!important}
   footer{padding-bottom:118px!important}
   .bottom-nav,.partner-bottom{width:100%;border-radius:0}
 }
+
+
+/* v0.6.6 header layout restore: wordmark left, controls right */
+#app>.app-header, .app-header {
+  width:100%;max-width:980px;margin:0 auto;
+  display:flex!important;flex-direction:row!important;
+  align-items:center!important;justify-content:space-between!important;
+  text-align:left!important;gap:16px;
+  padding:17px 22px 14px;
+}
+.app-header .wordmark {
+  display:block;flex:1 1 auto;min-width:0;
+  margin:0!important;padding:0!important;
+  text-align:left!important;white-space:nowrap;
+  font-size:clamp(24px,5.3vw,32px);line-height:1.25;
+}
+.app-header .header-actions {
+  display:flex!important;flex:0 0 auto;align-items:center;justify-content:flex-end;
+  gap:12px;margin-left:auto;
+}
+.app-header .header-actions .icon-button {
+  width:44px;min-width:44px;height:44px;min-height:44px;
+  display:inline-flex;align-items:center;justify-content:center;
+  margin:0!important;padding:9px!important;
+}
+.app-header .header-actions .icon-button .svg-icon{height:24px;width:24px}
+@media(max-width:390px){
+  .app-header{padding:15px 16px 13px;gap:9px}
+  .app-header .wordmark{font-size:clamp(22px,6vw,28px)}
+  .app-header .header-actions{gap:4px}
+  .app-header .header-actions .icon-button{width:40px;min-width:40px;height:40px;min-height:40px}
+}
