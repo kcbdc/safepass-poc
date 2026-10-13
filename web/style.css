@@ -257,3 +257,69 @@ footer{padding-bottom:112px!important}
 /* v0.7.1 : expiry notices and standby state */
 .expiry-alert{padding:17px 20px;margin:12px 0 18px;border:1px solid #ead1a2;background:#fff5df;color:#73511a;border-radius:18px;font-size:14px;line-height:1.65;word-break:keep-all}
 .expiry-alert p{margin:10px 0 0;color:#73511a}.live.standby{border:1px solid #eed9b5;background:#fff6e8;color:#8b5a19}.live.standby strong{color:#8b5a19}.tag.standby{background:#fff0d4;color:#8e5a11}
+
+/* v0.7.2 Partner navigation: identical stacking to user navigation, green palette */
+.partner-mode .partner-bottom{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  align-items:stretch!important;
+  gap:8px!important;
+  padding:10px 12px max(10px,env(safe-area-inset-bottom))!important;
+  background:#fff!important;
+  border-top:1px solid #e1ede7!important;
+}
+.partner-mode .partner-bottom button,
+.partner-mode .partner-bottom button:not(.icon-button):not(.secondary){
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:6px!important;
+  width:100%!important;
+  min-width:0!important;
+  min-height:74px!important;
+  margin:0!important;
+  padding:9px 8px!important;
+  border:1px solid transparent!important;
+  border-radius:16px!important;
+  background:transparent!important;
+  color:#8eaaa0!important;
+  box-shadow:none!important;
+  font-size:13px!important;
+}
+.partner-mode .partner-bottom button.active,
+.partner-mode .partner-bottom button.active:not(.icon-button):not(.secondary){
+  color:#168265!important;
+  background:#edf8f2!important;
+  border-color:#d7eae0!important;
+}
+.partner-mode .partner-bottom .svg-icon,
+.partner-mode .partner-bottom .svg-icon.mini{
+  display:inline-flex!important;
+  flex:0 0 24px!important;
+  width:24px!important;
+  height:24px!important;
+  margin:0!important;
+  color:inherit!important;
+}
+.partner-mode .partner-bottom .svg-icon svg{
+  width:24px!important;
+  height:24px!important;
+  stroke-width:1.9!important;
+}
+.partner-mode .partner-bottom button>span:last-child{
+  display:block!important;
+  font-size:13px!important;
+  line-height:1.25!important;
+  font-weight:750!important;
+  white-space:nowrap!important;
+  text-align:center!important;
+}
+@media(max-width:420px){
+  .partner-mode .partner-bottom{gap:8px!important;padding-inline:10px!important}
+  .partner-mode .partner-bottom button{min-height:72px!important;padding:8px 6px!important}
+  .partner-mode .partner-bottom .svg-icon,
+  .partner-mode .partner-bottom .svg-icon.mini,
+  .partner-mode .partner-bottom .svg-icon svg{width:23px!important;height:23px!important}
+  .partner-mode .partner-bottom button>span:last-child{font-size:13px!important}
+}
