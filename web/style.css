@@ -448,3 +448,31 @@ footer{padding-bottom:112px!important}
  .partner-mode .partner-bottom button,.partner-mode .partner-bottom button:not(.icon-button):not(.secondary){padding:8px 6px!important;gap:6px!important}
  .partner-overdue-mode .partner-overdue-view .overdue-section{padding:18px;margin-bottom:20px}
 }
+
+
+/* v0.9.0: seamless safety ticker and five-step swipe guide */
+.notice-marquee{overflow:hidden!important;white-space:nowrap!important;padding:0!important;height:44px;display:flex;align-items:center}
+.notice-marquee-track{display:flex;align-items:center;width:max-content;animation:safepass-ticker 24s linear infinite;will-change:transform}
+.notice-marquee-track span{flex:none;padding:0 48px;white-space:nowrap;color:#805916;font-size:13px}
+@keyframes safepass-ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@media(prefers-reduced-motion:reduce){.notice-marquee-track{animation:none}.notice-marquee{overflow-x:auto!important}}
+.guide-wizard{width:100%;min-width:0;display:flex;flex-direction:column;gap:18px;margin:0 0 10px}
+.guide-progress{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+.guide-progress-segment{display:block;width:100%;height:8px!important;min-height:8px!important;border-radius:99px!important;padding:0!important;margin:0!important;background:#e9ecef!important;border:0!important}
+.guide-progress-segment.active{background:#2b70d7!important}
+.partner-mode .guide-progress-segment.active{background:#209a74!important}
+.guide-counter{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:17px;color:#667386}
+.guide-pill{border-radius:50px;background:#edf1f5;padding:10px 16px;white-space:nowrap;font-weight:700;color:#354558;font-size:15px}
+.guide-slide{background:#f2f3f4;border-radius:28px;padding:32px 25px 30px;min-height:335px;display:flex;align-items:center;justify-content:center;text-align:center;flex-direction:column;gap:15px;touch-action:pan-y;outline-offset:4px;min-width:0}
+.guide-icon{height:104px;width:104px;border-radius:50%;background:#fff;display:grid;place-items:center}
+.guide-icon .svg-icon,.guide-icon .svg-icon svg{width:54px;height:54px}
+.guide-icon.blue{color:#286bd4}.guide-icon.green{color:#178b6c;background:#e4f6ed}
+.guide-slide h2{font-size:29px;line-height:1.3;margin:0;color:#0e223e;word-break:keep-all}
+.guide-slide p{font-size:17px;line-height:1.65;margin:0;color:#56616c;word-break:keep-all;overflow-wrap:break-word;max-width:440px}
+.guide-slide p.guide-tip{font-size:14px;color:#6f7e8a}
+.guide-controls{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.guide-controls button,.partner-mode .guide-controls button:not(.icon-button):not(.secondary){background:#e8eef7!important;color:#254a73!important;border-radius:15px!important;min-height:44px!important;padding:10px 14px!important;margin:0!important;flex:0 0 auto}
+.guide-controls button:disabled{opacity:.4;cursor:default}
+.guide-controls span{font-size:12px;color:#8795a2;text-align:center}
+.partner-mode .guide-controls button:not(.icon-button):not(.secondary){background:#e7f4ee!important;color:#147a57!important}
+@media(max-width:600px){.guide-wizard{gap:15px}.guide-slide{min-height:305px;padding:27px 18px 25px;border-radius:24px}.guide-icon{height:92px;width:92px}.guide-slide h2{font-size:25px}.guide-slide p{font-size:15px}.guide-slide p.guide-tip{font-size:13px}.guide-counter{font-size:15px}.guide-pill{padding:8px 13px;font-size:13px}.guide-controls span{font-size:10px}}
