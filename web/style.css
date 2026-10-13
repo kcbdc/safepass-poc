@@ -406,3 +406,45 @@ footer{padding-bottom:112px!important}
 @media (max-width:720px){
   .partner-mode .partner-dashboard-head{margin-bottom:18px!important;}
 }
+
+
+/* v0.8.9: user and partner navigation identical dimensions, 3 tabs */
+.partner-mode .partner-bottom{
+ display:flex!important;grid-template-columns:none!important;gap:8px!important;
+ justify-content:space-around!important;align-items:stretch!important;
+ padding:10px 10px max(10px,env(safe-area-inset-bottom))!important;
+ border-top:1px solid #dfeadf!important;background:#fff!important;
+ box-shadow:0 -6px 20px rgba(17,35,67,.07)!important;
+}
+.partner-mode .partner-bottom button,.partner-mode .partner-bottom button:not(.icon-button):not(.secondary){
+ flex:1 1 0!important;display:flex!important;flex-direction:column!important;
+ align-items:center!important;justify-content:center!important;gap:6px!important;
+ min-height:0!important;border:0!important;border-radius:16px!important;
+ padding:10px 8px!important;background:transparent!important;color:#91a59c!important;
+ box-shadow:none!important;font-size:13px!important;font-weight:700!important;
+}
+.partner-mode .partner-bottom button.active,.partner-mode .partner-bottom button.active:not(.icon-button):not(.secondary){
+ color:#16865e!important;background:#edf8f2!important;border:0!important;
+ box-shadow:inset 0 0 0 1px #d6eadd!important;
+}
+.partner-mode .partner-bottom .svg-icon,.partner-mode .partner-bottom .svg-icon.nav,.partner-mode .partner-bottom .svg-icon.mini{
+ width:24px!important;height:24px!important;flex:0 0 24px!important;color:inherit!important;
+}
+.partner-mode .partner-bottom .svg-icon svg{
+ width:24px!important;height:24px!important;stroke:currentColor!important;stroke-width:1.9!important;
+}
+.partner-mode .partner-bottom button .nav-label,.partner-mode .partner-bottom button>span:last-child{
+ font-size:13px!important;line-height:1.2!important;font-weight:700!important;color:inherit!important;
+}
+/* the overdue list is separate from integrated management */
+.partner-overdue-view{display:none;min-width:0}
+.partner-overdue-mode .partner-overdue-view{display:block}
+.partner-overdue-mode .partner-dashboard-head,.partner-overdue-mode .partner-overview,.partner-overdue-mode .partner-main-grid{display:none!important}
+.partner-overdue-mode .partner-overdue-view .overdue-section{margin:0 0 24px;padding:24px;background:#fff}
+.partner-management-view .partner-overdue-view{display:none!important}
+.partner-mode .partner-dashboard-head{margin-bottom:20px!important}
+@media(max-width:720px){
+ .partner-mode .partner-bottom{gap:8px!important;padding:10px 10px max(10px,env(safe-area-inset-bottom))!important}
+ .partner-mode .partner-bottom button,.partner-mode .partner-bottom button:not(.icon-button):not(.secondary){padding:8px 6px!important;gap:6px!important}
+ .partner-overdue-mode .partner-overdue-view .overdue-section{padding:18px;margin-bottom:20px}
+}
