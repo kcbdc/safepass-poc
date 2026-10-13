@@ -60,6 +60,20 @@ export default {async fetch(req:Request,env:Env):Promise<Response>{
   await audit(env.DB,'DISCLOSURE_'+decision,null,id+'; no personal data released');
   return Response.json({case_id:id,status:decision,personal_data_released:false});
  }
+ // Demonstration-only identity reveal: fictitious profiles, never actual mobile ID data.
+ if(path==='/api/admin/disclosure/demo-identity'&&req.method==='POST'){
+  if(!adminOK)return fail('Unauthorized',401);
+  const caseId=safeText(x.case_id,60);
+  const row=await env.DB.prepare('SELECT d.id,d.rental_id,d.status,r.status rental_status,t.expires_at FROM disclosure_requests d JOIN rental_requests r ON r.id=d.rental_id JOIN guarantee_tokens t ON t.rental_id=r.id WHERE d.id=?').bind(caseId).first<{id:string;rental_id:string;status:string;rental_status:string;expires_at:string}>();
+  if(!row)return fail('Review case not found',404);
+  if(row.status!=='APPROVED_FOR_REVIEW'||row.rental_status!=='ACTIVE'||row.expires_at>now())return fail('Approved overdue case required',403);
+  // Stable synthetic profile selected from fictitious examples; only available after approval.
+  const digest=await sha(row.rental_id);
+  const profiles=[{name:'김안심 (가상)',phone:'010-0000-1001',birth:'1990-01-01',address:'가상시 안심구 1번지'}, {name:'이보증 (가상)',phone:'010-0000-1002',birth:'1994-05-12',address:'가상시 안심구 2번지'}, {name:'박대여 (가상)',phone:'010-0000-1003',birth:'1988-11-20',address:'가상시 안심구 3번지'}];
+  const profile=profiles[parseInt(digest.slice(0,2),16)%profiles.length];
+  await audit(env.DB,'DEMO_IDENTITY_VIEWED',row.rental_id,'Fictitious demo profile viewed by administrator, case '+caseId);
+  return Response.json({simulation:true,source:'FICTIONAL_TEST_DATA',case_id:caseId,rental_id:row.rental_id,profile,notice:'가상 신원정보입니다. 실제 모바일신분증과 연결되지 않습니다.'});
+ }
  if(path==='/api/partner/register'){
   const id=safeText(x.partner_id,50),name=safeText(x.name,100);
   if(!/^[a-z0-9-]{4,50}$/.test(id)||name.length<2)return fail('Partner ID and name required');
