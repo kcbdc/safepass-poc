@@ -35,6 +35,17 @@ export default {async fetch(req:Request,env:Env):Promise<Response>{
   const rows=await env.DB.prepare('SELECT d.id,d.rental_id,d.reason,d.status,d.created_at,d.reviewed_at,r.partner_id FROM disclosure_requests d JOIN rental_requests r ON r.id=d.rental_id ORDER BY d.created_at DESC LIMIT 100').all();
   return Response.json({cases:rows.results});
  }
+ if(path==='/api/admin/overdue'&&req.method==='GET'){
+  if(!adminOK)return fail('Unauthorized',401);
+  const rows=await env.DB.prepare(`SELECT r.id rental_id,r.partner_id,p.name partner_name,r.item,t.expires_at,
+   (SELECT d.id FROM disclosure_requests d WHERE d.rental_id=r.id ORDER BY d.created_at DESC LIMIT 1) case_id,
+   (SELECT d.status FROM disclosure_requests d WHERE d.rental_id=r.id ORDER BY d.created_at DESC LIMIT 1) review_status
+   FROM rental_requests r JOIN guarantee_tokens t ON t.rental_id=r.id
+   LEFT JOIN partners p ON p.id=r.partner_id
+   WHERE r.status='ACTIVE' AND t.status='ACTIVE' AND t.expires_at <= ?
+   ORDER BY t.expires_at DESC LIMIT 100`).bind(now()).all();
+  return Response.json({rentals:rows.results,simulation:true});
+ }
  if(path==='/api/admin/overview'){
   if(!adminOK)return fail('Unauthorized',401);
   const [a,b,c]=await Promise.all([env.DB.prepare('SELECT COUNT(*) n FROM rental_requests').first<{n:number}>(),env.DB.prepare('SELECT COUNT(*) n FROM guarantee_tokens').first<{n:number}>(),env.DB.prepare('SELECT event_type,rental_id,at,detail FROM audit_events ORDER BY at DESC LIMIT 30').all()]);
@@ -43,6 +54,19 @@ export default {async fetch(req:Request,env:Env):Promise<Response>{
  if(req.method!=='POST')return fail('Not found',404);
  if(origin&&origin!==allowed)return fail('Origin not allowed',403);
  const x=await body(req),device=safeText(req.headers.get('X-Demo-Device'),60);
+ if(path==='/api/admin/overdue/request'){
+  if(!adminOK)return fail('Unauthorized',401);
+  const id=safeText(x.rental_id,50),reason=safeText(x.reason,200);
+  const rental=await env.DB.prepare(`SELECT r.id FROM rental_requests r JOIN guarantee_tokens t ON t.rental_id=r.id
+  WHERE r.id=? AND r.status='ACTIVE' AND t.status='ACTIVE' AND t.expires_at<=?`).bind(id,now()).first();
+  if(!rental)return fail('Overdue active rental required',409);
+  const prior=await env.DB.prepare('SELECT id,status FROM disclosure_requests WHERE rental_id=? ORDER BY created_at DESC LIMIT 1').bind(id).first<{id:string;status:string}>();
+  if(prior && prior.status!=='REJECTED')return fail('Review already exists',409);
+  const caseId=crypto.randomUUID();
+  await env.DB.prepare('INSERT INTO disclosure_requests(id,rental_id,reason,status,created_at) VALUES(?,?,?,?,?)').bind(caseId,id,reason||'Overdue rental demo review','PENDING_REVIEW',now()).run();
+  await audit(env.DB,'DISCLOSURE_REQUESTED',id,'Simulation: admin started review; no identity released');
+  return Response.json({case_id:caseId,status:'PENDING_REVIEW'});
+ }
  if(path==='/api/admin/partner/decide'){
   if(!adminOK)return fail('Unauthorized',401);
   const id=safeText(x.partner_id,50),action=x.action;
