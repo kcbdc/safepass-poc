@@ -339,3 +339,39 @@ footer{padding-bottom:112px!important}
   .partner-mode .partner-bottom{gap:8px!important;padding-inline:10px!important}
   .partner-mode .partner-bottom>button{padding:8px 6px!important;min-height:72px!important}
 }
+
+/* v0.8.4: partner navigation SVG icons enlarged 2.5x (26px -> 65px) */
+.partner-mode .partner-bottom>button,
+.partner-mode .partner-bottom>button:not(.icon-button):not(.secondary){
+  min-height:132px!important;
+  gap:8px!important;
+  padding:12px 8px!important;
+}
+.partner-mode .partner-bottom>button>.svg-icon,
+.partner-mode .partner-bottom>button>.svg-icon.mini,
+.partner-mode .partner-bottom>button>.svg-icon svg{
+  display:inline-flex!important;
+  width:65px!important;
+  height:65px!important;
+  min-width:65px!important;
+  min-height:65px!important;
+  flex:0 0 65px!important;
+  opacity:1!important;
+  color:inherit!important;
+}
+.partner-mode .partner-bottom>button>.svg-icon svg{
+  display:block!important;
+  stroke:currentColor!important;
+  stroke-width:1.8!important;
+}
+.partner-mode .partner-bottom>button>span:last-child{
+  font-size:13px!important;
+  line-height:1.25!important;
+}
+@media(max-width:420px){
+  .partner-mode .partner-bottom>button,
+  .partner-mode .partner-bottom>button:not(.icon-button):not(.secondary){min-height:132px!important;padding:12px 6px!important}
+}
+/* Ensure fixed nav does not overlap content after its new height */
+.partner-mode .app-main{padding-bottom:205px!important}
+.partner-mode footer{padding-bottom:195px!important}
