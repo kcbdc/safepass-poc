@@ -538,3 +538,104 @@ footer{padding-bottom:112px!important}
   .qr-preview{width:min(248px,100%)}
   .qr-watermark span{font-size:12px;line-height:1.1}
 }
+
+/* v0.9.4: single shared layout metrics for user/partner navigation.
+   Use direct-child specificity to override accumulated old partner-only rules. */
+#app > nav.bottom-nav,
+body.partner-mode #app > nav.partner-bottom {
+  display:flex!important;
+  grid-template-columns:none!important;
+  align-items:stretch!important;
+  justify-content:space-around!important;
+  gap:10px!important;
+  padding:10px 14px max(10px,env(safe-area-inset-bottom))!important;
+  width:min(100%,980px)!important;
+  background:rgba(255,255,255,.96)!important;
+  border-top:1px solid #e4ebf5!important;
+  box-shadow:0 -4px 18px rgba(16,43,83,.05)!important;
+}
+#app > nav.bottom-nav > button,
+body.partner-mode #app > nav.partner-bottom > button,
+body.partner-mode #app > nav.partner-bottom > button:not(.icon-button):not(.secondary) {
+  box-sizing:border-box!important;
+  display:flex!important;
+  flex:1 1 0!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:6px!important;
+  padding:10px 8px!important;
+  min-height:0!important;
+  height:auto!important;
+  border-radius:16px!important;
+  border:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  font-size:13px!important;
+  font-weight:700!important;
+  line-height:1.2!important;
+  color:#97a4b6!important;
+}
+#app > nav.bottom-nav > button > .svg-icon,
+body.partner-mode #app > nav.partner-bottom > button > .svg-icon,
+body.partner-mode #app > nav.partner-bottom > button > .svg-icon.mini {
+  box-sizing:content-box!important;
+  display:inline-flex!important;
+  flex:0 0 24px!important;
+  width:24px!important;
+  height:24px!important;
+  max-width:24px!important;
+  max-height:24px!important;
+  align-items:center!important;
+  justify-content:center!important;
+  color:inherit!important;
+  opacity:1!important;
+  margin:0!important;
+  padding:0!important;
+  line-height:0!important;
+}
+#app > nav.bottom-nav > button > .svg-icon svg,
+body.partner-mode #app > nav.partner-bottom > button > .svg-icon svg {
+  display:block!important;
+  width:24px!important;
+  height:24px!important;
+  max-width:24px!important;
+  max-height:24px!important;
+  flex:none!important;
+  stroke:currentColor!important;
+  stroke-width:1.9!important;
+}
+#app > nav.bottom-nav > button > .nav-label,
+body.partner-mode #app > nav.partner-bottom > button > .nav-label,
+body.partner-mode #app > nav.partner-bottom > button > span:last-child {
+  display:block!important;
+  font-size:13px!important;
+  font-weight:700!important;
+  line-height:1.2!important;
+  color:inherit!important;
+  white-space:nowrap!important;
+  padding:0!important;
+  margin:0!important;
+}
+#app > nav.bottom-nav > button.active {
+  color:#2869d5!important;
+  background:#f2f7ff!important;
+  box-shadow:inset 0 0 0 1px #dce7fb!important;
+}
+body.partner-mode #app > nav.partner-bottom > button,
+body.partner-mode #app > nav.partner-bottom > button:not(.icon-button):not(.secondary){color:#91a59c!important}
+body.partner-mode #app > nav.partner-bottom > button.active,
+body.partner-mode #app > nav.partner-bottom > button.active:not(.icon-button):not(.secondary){
+  color:#16865e!important;
+  background:#edf8f2!important;
+  box-shadow:inset 0 0 0 1px #d6eadd!important;
+}
+body.partner-mode #app > nav.partner-bottom > button.active > .svg-icon svg,
+body.partner-mode #app > nav.partner-bottom > button:not(.active) > .svg-icon svg{stroke:currentColor!important}
+@media(max-width:720px){
+  #app > nav.bottom-nav,
+  body.partner-mode #app > nav.partner-bottom {gap:8px!important;padding:10px 10px max(10px,env(safe-area-inset-bottom))!important}
+  #app > nav.bottom-nav > button,
+  body.partner-mode #app > nav.partner-bottom > button,
+  body.partner-mode #app > nav.partner-bottom > button:not(.icon-button):not(.secondary){padding:8px 6px!important;gap:6px!important}
+}
