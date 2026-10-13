@@ -61,10 +61,12 @@ export default {async fetch(req:Request,env:Env):Promise<Response>{
   return Response.json({case_id:id,status:decision,personal_data_released:false});
  }
  if(path==='/api/partner/register'){
-  const id=safeText(x.partner_id,50),name=safeText(x.name,100),secret=safeText(x.partner_key,200);
-  if(!/^[a-z0-9-]{4,50}$/.test(id)||name.length<2||secret.length<24)return fail('Partner ID, name and key (24+ chars) required');
+  const id=safeText(x.partner_id,50),name=safeText(x.name,100);
+  if(!/^[a-z0-9-]{4,50}$/.test(id)||name.length<2)return fail('Partner ID and name required');
+  // Generate a unique 256-bit secret on the server; never persist plaintext.
+  const secret=hex(crypto.getRandomValues(new Uint8Array(32)).buffer);
   await env.DB.prepare('INSERT INTO partners(id,name,key_hash,status,created_at) VALUES(?,?,?,?,?)').bind(id,name,await sha(secret),'PENDING',now()).run();
-  await audit(env.DB,'PARTNER_REGISTERED',null,id);return Response.json({partner_id:id,status:'PENDING'});
+  await audit(env.DB,'PARTNER_REGISTERED',null,id);return Response.json({partner_id:id,status:'PENDING',partner_key:secret});
  }
  if(!device||! /^[a-f0-9-]{36}$/i.test(device))return fail('Demo device ID required',401);
  if(path==='/api/request/create'){
