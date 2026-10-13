@@ -604,3 +604,77 @@ body.partner-mode #app > nav.partner-bottom > button.active,body.partner-mode #a
  color:#16865e!important;background:#edf8f2!important;box-shadow:inset 0 0 0 1px #d6eadd!important;
 }
 @media(max-width:720px){body.partner-mode #app > nav.partner-bottom > button,body.partner-mode #app > nav.partner-bottom > button:not(.icon-button):not(.secondary){padding:8px 6px!important;}}
+
+
+/* v0.9.6 — desktop-first responsive layout; mobile rules remain untouched */
+@media (min-width:1024px) {
+  :root { --desktop-content-width: min(1440px, calc(100vw - 96px)); }
+  html { scrollbar-gutter: stable; }
+  body { background: #f5f7fa; }
+  #app { min-height: 100dvh; }
+  #app > .app-header {
+    max-width: var(--desktop-content-width);width:100%;
+    padding: 24px 18px 20px; margin: 0 auto;
+  }
+  #app > .app-header .wordmark {font-size:32px;}
+  #app > .notice-marquee {height:40px;}
+  #app > main.app-main {
+    max-width: var(--desktop-content-width) !important;
+    width:100%; margin: 0 auto; padding: 32px 0 140px !important;
+    flex: 1 0 auto;
+  }
+  #app > main.app-main > .grid.user-home-grid {
+    display:grid!important;
+    grid-template-columns:minmax(0,1.06fr) minmax(0,.94fr)!important;
+    grid-template-areas:"welcome issued" "request privacy";
+    align-items:start;align-content:start;
+    column-gap:26px; row-gap:26px;
+  }
+  .user-home-grid > section {display:contents!important;}
+  .user-home-grid .user-welcome {grid-area:welcome;}
+  .user-home-grid .request-step-card {grid-area:request;}
+  .user-home-grid .issued-card {grid-area:issued;}
+  .user-home-grid .info-card {grid-area:privacy;}
+  .user-home-grid .card {margin:0;min-width:0;align-self:start; height:auto!important;}
+  .user-home-grid .user-welcome {padding:32px 38px;gap:24px;}
+  .user-home-grid .user-welcome h1 {font-size:clamp(38px,3vw,52px);line-height:1.23;margin:0;}
+  .user-home-grid .identity-pass {min-height:250px;padding:30px 34px;}
+  .user-home-grid .issued-card {min-height:290px;}
+  .user-home-grid .info-card {min-height:0;}
+  .user-home-grid .request-step-card {padding:32px 38px;}
+  .user-home-grid .guide-slide {min-height:285px;}
+  .user-home-grid .empty {padding:30px 18px;}
+  #app > nav.bottom-nav, #app > nav.partner-bottom {
+    width:min(720px,calc(100vw - 96px))!important;
+    max-width:720px!important;
+    left:50%!important;right:auto!important;
+    transform:translateX(-50%);border:1px solid #e3e9f1;
+    border-bottom:0; border-radius:24px 24px 0 0;
+    padding:10px 14px max(10px,env(safe-area-inset-bottom));
+    box-shadow:0 -6px 28px rgba(17,35,67,.08);
+  }
+  /* Partner home: avoid tall full-column filler cards */
+  body.partner-mode #app > main.app-main {padding-top:28px!important;padding-bottom:145px!important;}
+  .partner-mode .partner-dashboard-head {margin-bottom:22px!important;}
+  .partner-mode .partner-overview {padding:28px 32px;margin-bottom:24px!important;}
+  .partner-mode .partner-overview .partner-kpis {grid-template-columns:repeat(2,minmax(0,1fr));}
+  .partner-mode .partner-main-grid {grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:26px;align-items:start;}
+  .partner-mode .partner-main-grid>section{display:flex;flex-direction:column;gap:24px;align-self:start;}
+  .partner-mode .partner-main-grid .card{height:auto;align-self:stretch;margin-bottom:0;}
+  .partner-mode .partner-request-card, .partner-mode .partner-verify-card {padding:32px!important;}
+  .partner-overdue-mode .partner-overdue-view,.partner-management-view .partner-main-grid {max-width:100%;}
+  footer {padding:18px 16px 130px!important;}
+}
+@media (min-width:1024px) and (max-width:1260px) {
+  :root { --desktop-content-width: calc(100vw - 64px); }
+  #app > main.app-main > .grid.user-home-grid {gap:20px;}
+  .user-home-grid .user-welcome,.user-home-grid .request-step-card {padding:26px 28px;}
+  .partner-mode .partner-main-grid{gap:20px;}
+}
+@media (min-width:1600px) {
+  :root { --desktop-content-width: min(1520px, calc(100vw - 144px)); }
+  #app > main.app-main {padding-top:42px!important;}
+  #app > main.app-main > .grid.user-home-grid{column-gap:32px;row-gap:32px;}
+  .user-home-grid .user-welcome {padding:38px 46px;}
+  .user-home-grid .request-step-card {padding:36px 46px;}
+}
