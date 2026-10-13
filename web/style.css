@@ -75,3 +75,34 @@ details{padding:16px 18px}details summary{padding:2px 0}
 @media(max-width:900px){.user-welcome h1{font-size:48px}.app-main>.grid,.user-home-grid{grid-template-columns:minmax(0,1fr)}.partner-main-grid{grid-template-columns:minmax(0,1fr)}}
 @media(max-width:720px){.app-header{padding:16px 18px 12px}.app-header .wordmark{font-size:30px}.app-main{padding:0 14px 90px}.card{padding:22px;border-radius:24px}.user-welcome{padding:24px;gap:18px}.user-welcome h1{font-size:44px}.identity-pass{min-height:240px;padding:22px 22px 20px}.pass-number{font-size:60px}.pass-number small{font-size:22px;padding-bottom:8px}.request-step-card{padding:22px}.step-visual{padding:28px 18px}.step-visual-icon{width:104px;height:104px}.scanbutton{min-height:58px;padding:16px 18px}.partner-dashboard-head,.partner-overview{padding:20px 22px}.partner-wordmark{font-size:27px}.partner-kpis{grid-template-columns:1fr 1fr;gap:12px}.partner-kpi{min-height:112px;padding:18px 16px}.partner-main-grid .card{padding:22px}.bottom-nav{gap:8px;padding-inline:10px}.bottom-nav button{padding:8px 6px}.partner-bottom{padding-inline:10px}}
 @media(max-width:420px){.user-welcome h1{font-size:38px}.user-welcome .eyebrow{font-size:16px}.partner-wordmark{font-size:24px}.soft-pill,.green-pill{padding:8px 12px;font-size:13px}.partner-kpis{grid-template-columns:1fr}.action{flex-direction:column}}
+
+/* v0.6.2: partner form vertical rhythm — preserve all existing events and API calls */
+.partner-main-grid #reason + #disclose {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 18px;
+  min-height: 52px;
+  padding-inline: 22px;
+}
+.partner-main-grid .card > label + input,
+.partner-main-grid .card > label + select {
+  margin-bottom: 4px;
+}
+.partner-main-grid .partner-request-card > #partnerKey + #savePartner,
+.partner-main-grid .partner-request-card > #hours + #create,
+.partner-main-grid details #partnerName + #registerPartner {
+  margin-top: 16px;
+}
+.partner-main-grid .partner-verify-card > #rental + .action {
+  margin-top: 16px;
+}
+.partner-main-grid .card > p + label {
+  margin-top: 14px;
+}
+@media (max-width: 720px) {
+  .partner-main-grid #reason + #disclose {
+    margin-top: 20px;
+    min-height: 52px;
+  }
+}
