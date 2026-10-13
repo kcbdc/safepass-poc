@@ -1,0 +1,18 @@
+SafePass v0.5 · 첨부 디자인 고충실도 UI 개편
+
+GitHub kcbdc/safepass-poc 저장소에서 두 파일만 교체하세요.
+1. web/main.js
+2. web/style.css
+
+기존 worker/, functions/, wrangler.toml, D1, Service Binding, ALLOWED_ORIGIN은 수정하지 마세요.
+Cloudflare Pages 자동 배포 완료 후 Ctrl+F5 또는 시크릿 모드로 접속하세요.
+
+변경 사항
+- 이용자 지갑 카드, QR 요청 화면의 5단계 진행 표시
+- 대여처 SafePass Partner 대시보드 헤더 및 카드형 지표
+- 네이비, 블루, 민트 색상 및 모바일 화면의 비율/여백/글자 크기
+- 기존 기능 이벤트 및 동일 도메인 API 경로 보존
+
+주의: 상단 대여처 지표 중 '진행 중 대여'는 서버 집계 API가 없어 숫자를 임의로 표시하지 않고 — 로 표기합니다.
+UI 스타일 변경이며 새로 디자인한 시연 카드의 수치는 가상 결과로 제시하지 않습니다.
+정적 JS 구문 검사는 통과했으며 실제 Cloudflare 배포·실기기 검증 전입니다.
