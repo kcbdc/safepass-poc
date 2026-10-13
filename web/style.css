@@ -340,7 +340,7 @@ footer{padding-bottom:112px!important}
   .partner-mode .partner-bottom>button{padding:8px 6px!important;min-height:72px!important}
 }
 
-/* v0.8.4: partner navigation SVG icons enlarged 2.5x (26px -> 65px) */
+/* v0.8.4: partner navigation SVG icons enlarged 2.5x (26px -> 45.5px) */
 .partner-mode .partner-bottom>button,
 .partner-mode .partner-bottom>button:not(.icon-button):not(.secondary){
   min-height:132px!important;
@@ -351,11 +351,11 @@ footer{padding-bottom:112px!important}
 .partner-mode .partner-bottom>button>.svg-icon.mini,
 .partner-mode .partner-bottom>button>.svg-icon svg{
   display:inline-flex!important;
-  width:65px!important;
-  height:65px!important;
-  min-width:65px!important;
-  min-height:65px!important;
-  flex:0 0 65px!important;
+  width:45.5px!important;
+  height:45.5px!important;
+  min-width:45.5px!important;
+  min-height:45.5px!important;
+  flex:0 0 45.5px!important;
   opacity:1!important;
   color:inherit!important;
 }
@@ -375,3 +375,5 @@ footer{padding-bottom:112px!important}
 /* Ensure fixed nav does not overlap content after its new height */
 .partner-mode .app-main{padding-bottom:205px!important}
 .partner-mode footer{padding-bottom:195px!important}
+
+/* v0.8.5: partner SVG icons 30% smaller than v0.8.4 (65px x 0.7). */
