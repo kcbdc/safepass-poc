@@ -182,3 +182,20 @@ footer{padding-bottom:112px!important}
   .app-header .header-actions{gap:4px}
   .app-header .header-actions .icon-button{width:40px;min-width:40px;height:40px;min-height:40px}
 }
+
+
+/* v0.6.7: two-mode partner navigation, fixed footer, management panel */
+.partner-bottom{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px!important;padding:10px 16px max(10px,env(safe-area-inset-bottom))!important}
+.partner-mode .partner-bottom button,.partner-mode .partner-bottom button:not(.icon-button):not(.secondary){display:flex!important;flex-direction:row!important;gap:9px!important;align-items:center!important;justify-content:center!important;min-height:54px;color:#23654f!important;background:#f0f8f4!important;border:1px solid #d8e9e0!important;padding:12px!important;font-weight:750}
+.partner-mode .partner-bottom button.active,.partner-mode .partner-bottom button.active:not(.icon-button):not(.secondary){background:#268d72!important;color:#fff!important;border-color:#268d72!important}
+.partner-mode .partner-bottom button.active .svg-icon{color:#fff!important}
+.partner-mode .partner-bottom .svg-icon{width:20px;height:20px}
+.partner-admin-card{display:none!important}
+.partner-management-view .partner-admin-card{display:flex!important}
+.partner-management-view .partner-dashboard-head,.partner-management-view .partner-overview,.partner-management-view .partner-request-card,.partner-management-view .partner-verify-card,.partner-management-view .partner-main-grid>section>.card:not(.partner-admin-card){display:none!important}
+.partner-management-view .partner-main-grid{display:block!important}
+.partner-management-view .partner-main-grid>section:first-child{display:none!important}
+.partner-management-view .partner-main-grid>section:last-child{display:block!important;width:100%!important}
+.partner-management-view .partner-admin-card{margin-top:0!important}
+.admin-session-hint{padding:15px 18px;border-radius:14px;background:#eaf6ef;color:#166e55;line-height:1.55}
+@media(max-width:420px){.partner-bottom{gap:8px!important;padding-inline:10px!important}.partner-bottom button{font-size:14px!important}}
