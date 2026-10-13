@@ -76,33 +76,13 @@ details{padding:16px 18px}details summary{padding:2px 0}
 @media(max-width:720px){.app-header{padding:16px 18px 12px}.app-header .wordmark{font-size:30px}.app-main{padding:0 14px 90px}.card{padding:22px;border-radius:24px}.user-welcome{padding:24px;gap:18px}.user-welcome h1{font-size:44px}.identity-pass{min-height:240px;padding:22px 22px 20px}.pass-number{font-size:60px}.pass-number small{font-size:22px;padding-bottom:8px}.request-step-card{padding:22px}.step-visual{padding:28px 18px}.step-visual-icon{width:104px;height:104px}.scanbutton{min-height:58px;padding:16px 18px}.partner-dashboard-head,.partner-overview{padding:20px 22px}.partner-wordmark{font-size:27px}.partner-kpis{grid-template-columns:1fr 1fr;gap:12px}.partner-kpi{min-height:112px;padding:18px 16px}.partner-main-grid .card{padding:22px}.bottom-nav{gap:8px;padding-inline:10px}.bottom-nav button{padding:8px 6px}.partner-bottom{padding-inline:10px}}
 @media(max-width:420px){.user-welcome h1{font-size:38px}.user-welcome .eyebrow{font-size:16px}.partner-wordmark{font-size:24px}.soft-pill,.green-pill{padding:8px 12px;font-size:13px}.partner-kpis{grid-template-columns:1fr}.action{flex-direction:column}}
 
-/* v0.6.2: partner form vertical rhythm — preserve all existing events and API calls */
-.partner-main-grid #reason + #disclose {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 18px;
-  min-height: 52px;
-  padding-inline: 22px;
-}
-.partner-main-grid .card > label + input,
-.partner-main-grid .card > label + select {
-  margin-bottom: 4px;
-}
-.partner-main-grid .partner-request-card > #partnerKey + #savePartner,
-.partner-main-grid .partner-request-card > #hours + #create,
-.partner-main-grid details #partnerName + #registerPartner {
-  margin-top: 16px;
-}
-.partner-main-grid .partner-verify-card > #rental + .action {
-  margin-top: 16px;
-}
-.partner-main-grid .card > p + label {
-  margin-top: 14px;
-}
-@media (max-width: 720px) {
-  .partner-main-grid #reason + #disclose {
-    margin-top: 20px;
-    min-height: 52px;
-  }
-}
+/* v0.6.3: visible scanner + partner admin integration + consistent inner spacing */
+.scanner-panel[hidden]{display:none!important}
+.scanner-panel{display:flex;flex-direction:column;gap:14px;margin:18px 0 24px;padding:20px;background:#f4f8fd;border:1px solid #dce6f4;border-radius:22px;min-width:0}
+.scanner-title{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}.scanner-title strong{font-size:19px;color:#1b3c6c}.scanner-title button{width:auto;min-height:42px;padding:9px 16px}
+.scanner-help{margin:0;color:#536b89;font-size:14px;line-height:1.65}.scanner-panel .scanner{display:block!important;width:100%;max-width:450px;min-height:230px;background:#10243f;border-radius:18px;overflow:hidden;margin:0 auto}
+.scanner-panel #reader video{display:block;width:100%!important;height:auto!important;max-height:420px;object-fit:cover;border-radius:16px}.scanner-panel #reader__scan_region{min-height:220px}.scanner-panel #reader__dashboard{padding:10px;background:white}
+.scanner-status{background:#e6eefb;border-radius:12px;padding:13px 16px;color:#183e70;font-size:13px;line-height:1.65;overflow-wrap:anywhere}.scanner-panel #retryScanner{width:100%;min-height:48px}
+.partner-admin-card{margin-top:24px;min-width:0;display:flex;flex-direction:column;gap:18px}.partner-admin-card p{line-height:1.7;margin:0}.partner-admin-card input{margin-bottom:0}.partner-admin-card .admin-load{align-self:flex-start;margin-top:8px;min-height:50px}.partner-admin-card #stats,.partner-admin-card #partners,.partner-admin-card #cases{margin-top:12px;min-width:0}.partner-admin-card #partners>.row,.partner-admin-card #cases>.row{display:flex;gap:16px;flex-wrap:wrap;align-items:center;justify-content:space-between;border-bottom:1px solid #e8edea;padding:16px 0}.partner-admin-card #partners>.row>span,.partner-admin-card #cases>.row>span{min-width:0;overflow-wrap:anywhere}.partner-admin-card button.mini{margin:4px;min-height:38px;padding:9px 12px}
+.partner-mode .partner-admin-card{background:#fff}.partner-main-grid .card>label{margin:12px 0 7px;display:block}.partner-main-grid .card>input,.partner-main-grid .card>select{margin-bottom:10px;max-width:100%;box-sizing:border-box}.partner-main-grid .card>button:not(.icon-button){margin-top:10px;margin-bottom:12px}.partner-main-grid .card>details{margin:14px 0 20px;padding:18px}.partner-main-grid details input{margin:10px 0 16px}.partner-main-grid details button{margin:5px 0 18px}.partner-main-grid details .hint{margin-top:12px}.partner-main-grid #result,.partner-main-grid #partnerLive{margin-top:14px}.partner-mode .partner-main-grid .card{min-width:0}.card .hint,.card .empty{overflow-wrap:anywhere}
+@media(max-width:720px){.scanner-panel{padding:15px;margin:14px 0 20px}.scanner-panel .scanner{min-height:205px}.partner-admin-card{margin-top:20px}.partner-admin-card .admin-load{width:100%}.partner-admin-card .row>span:last-child{display:flex;flex-wrap:wrap;gap:5px}}
