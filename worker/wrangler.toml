@@ -3,10 +3,10 @@ main = "src/index.ts"
 compatibility_date = "2026-10-01"
 
 # 반드시 신규 D1 데이터베이스를 생성한 다음 아래 설정을 활성화하세요.
-# [[d1_databases]]
-# binding = "DB"
-# database_name = "safepass-poc-db"
-# database_id = "7fcfee76-0936-44d0-ae1d-b82038df88df"
+[[d1_databases]]
+binding = "DB"
+database_name = "safepass-poc-db"
+database_id = "7fcfee76-0936-44d0-ae1d-b82038df88df"
 
 # wrangler secret put ADMIN_KEY
 # wrangler secret put TOKEN_SECRET
