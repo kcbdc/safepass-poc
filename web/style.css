@@ -253,3 +253,7 @@ footer{padding-bottom:112px!important}
 .demo-identity-panel dt{font-size:13px;color:#607b70}.demo-identity-panel dd{margin:0;font-size:14px;color:#1d4436;overflow-wrap:anywhere}
 .demo-identity-panel small{display:block;color:#60796e;line-height:1.6}
 .partner-entry-actions{flex-wrap:wrap}.partner-entry-actions .demo-reveal-btn{background:#dbf5e8!important;color:#12664a!important;border-color:#bce5d0!important}
+
+/* v0.7.1 : expiry notices and standby state */
+.expiry-alert{padding:17px 20px;margin:12px 0 18px;border:1px solid #ead1a2;background:#fff5df;color:#73511a;border-radius:18px;font-size:14px;line-height:1.65;word-break:keep-all}
+.expiry-alert p{margin:10px 0 0;color:#73511a}.live.standby{border:1px solid #eed9b5;background:#fff6e8;color:#8b5a19}.live.standby strong{color:#8b5a19}.tag.standby{background:#fff0d4;color:#8e5a11}
