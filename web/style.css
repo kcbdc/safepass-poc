@@ -86,3 +86,43 @@ details{padding:16px 18px}details summary{padding:2px 0}
 .partner-admin-card{margin-top:24px;min-width:0;display:flex;flex-direction:column;gap:18px}.partner-admin-card p{line-height:1.7;margin:0}.partner-admin-card input{margin-bottom:0}.partner-admin-card .admin-load{align-self:flex-start;margin-top:8px;min-height:50px}.partner-admin-card #stats,.partner-admin-card #partners,.partner-admin-card #cases{margin-top:12px;min-width:0}.partner-admin-card #partners>.row,.partner-admin-card #cases>.row{display:flex;gap:16px;flex-wrap:wrap;align-items:center;justify-content:space-between;border-bottom:1px solid #e8edea;padding:16px 0}.partner-admin-card #partners>.row>span,.partner-admin-card #cases>.row>span{min-width:0;overflow-wrap:anywhere}.partner-admin-card button.mini{margin:4px;min-height:38px;padding:9px 12px}
 .partner-mode .partner-admin-card{background:#fff}.partner-main-grid .card>label{margin:12px 0 7px;display:block}.partner-main-grid .card>input,.partner-main-grid .card>select{margin-bottom:10px;max-width:100%;box-sizing:border-box}.partner-main-grid .card>button:not(.icon-button){margin-top:10px;margin-bottom:12px}.partner-main-grid .card>details{margin:14px 0 20px;padding:18px}.partner-main-grid details input{margin:10px 0 16px}.partner-main-grid details button{margin:5px 0 18px}.partner-main-grid details .hint{margin-top:12px}.partner-main-grid #result,.partner-main-grid #partnerLive{margin-top:14px}.partner-mode .partner-main-grid .card{min-width:0}.card .hint,.card .empty{overflow-wrap:anywhere}
 @media(max-width:720px){.scanner-panel{padding:15px;margin:14px 0 20px}.scanner-panel .scanner{min-height:205px}.partner-admin-card{margin-top:20px}.partner-admin-card .admin-load{width:100%}.partner-admin-card .row>span:last-child{display:flex;flex-wrap:wrap;gap:5px}}
+
+
+/* v0.6.4: consistent partner entries, typography, box padding and spacing */
+html,body{overflow-x:hidden} .app-main,.card,.partner-overview,.partner-dashboard-head{min-width:0;max-width:100%}
+.card,.partner-overview,.partner-dashboard-head{overflow-wrap:normal;word-break:keep-all}
+.card p,.card label,.hint,.scanner-status,.scanner-help,.partner-dashboard-head p{word-break:keep-all;overflow-wrap:break-word;line-height:1.65}
+input,select,button,textarea{min-width:0;max-width:100%;box-sizing:border-box}
+input,select{padding:14px 18px!important;line-height:1.4}button{line-height:1.35;padding:12px 18px}
+.partner-mode .partner-bottom button,.partner-mode .partner-bottom button:not(.icon-button):not(.secondary){background:#f0f8f4!important;color:#137455!important;border:1px solid #d4e9db!important;box-shadow:none!important;opacity:1!important;font-weight:750}
+.partner-mode .partner-bottom .svg-icon{color:#137455!important;opacity:1!important}
+.partner-bottom{background:#fff;border-top:1px solid #e3ebe6;z-index:11;position:sticky}
+.partner-bottom button{min-height:54px;font-size:15px;white-space:nowrap}
+.partner-dashboard-head{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:22px 26px!important}
+.partner-dashboard-intro{display:flex;align-items:center;gap:13px;min-width:0;flex:1}
+.partner-dashboard-intro p{margin:0!important;font-size:14px;line-height:1.55;color:#62717d}
+.partner-dashboard-head .soft-pill{flex:none;margin-left:auto;white-space:nowrap}
+.partner-shield{display:inline-flex;flex:none;align-items:center;justify-content:center;width:28px;height:28px}
+.partner-overview-title{gap:16px;align-items:flex-start}.partner-overview-title>div{min-width:0;flex:1}.partner-overview-title h2{line-height:1.35}
+.partner-admin-card{gap:20px}.partner-admin-card #partners,.partner-admin-card #cases{display:flex;flex-direction:column;gap:0;margin-top:8px}
+.partner-admin-card #partners>h2,.partner-admin-card #cases>h2{margin:14px 0 10px;font-size:23px}
+.partner-entry{display:grid;grid-template-columns:minmax(0,1fr);gap:15px;padding:22px 8px;border-bottom:1px solid #e8edea;min-width:0}
+.partner-entry:first-of-type{padding-top:17px}.partner-entry:last-child{border-bottom:0}
+.partner-entry-info{min-width:0;display:grid;gap:7px}
+.partner-entry-name{display:block;font-size:17px;font-weight:800;color:#1a344f;line-height:1.4;word-break:keep-all;overflow-wrap:break-word}
+.partner-entry-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-width:0}
+.partner-entry-id{font-size:13px;color:#687b8e;line-height:1.4;overflow-wrap:anywhere;min-width:0}
+.status-badge{font-size:11px;padding:5px 9px;border-radius:999px;font-weight:750;background:#eef1f5;color:#536579;line-height:1.2}
+.status-badge.approved{background:#def6e9;color:#107b50}.status-badge.pending{background:#fff2d5;color:#916216}
+.partner-entry-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;width:100%}
+.partner-entry-actions .mini,.partner-mode .partner-entry-actions button.mini{display:flex;align-items:center;justify-content:center;padding:12px 8px!important;margin:0!important;min-height:44px!important;border:1px solid #e1e9ec;border-radius:14px;background:#f0f3f6!important;color:#37546a!important;font-size:14px;font-weight:750;white-space:nowrap;line-height:1.2}
+.partner-entry-actions button:focus-visible{outline:2px solid #82b4dc;outline-offset:2px}
+.partner-admin-card #stats .card{padding:20px;margin-bottom:0}.partner-admin-card #stats .grid{gap:12px}
+.partner-main-grid .card>label{margin:16px 0 8px}.partner-main-grid .card>input,.partner-main-grid .card>select{margin:0 0 16px}.partner-main-grid .card>button:not(.icon-button){margin:6px 0 15px}
+.partner-main-grid .card>details{margin:16px 0 22px;padding:20px}
+.partner-main-grid .card>details summary{padding:4px 0}.partner-main-grid details input{margin:12px 0 16px}
+.scanner-status{padding:16px 18px;font-size:14px;line-height:1.65;white-space:normal;word-break:keep-all;overflow-wrap:break-word}
+.scanner-panel{gap:18px;padding:20px}.scanner-panel #retryScanner{margin-top:4px}
+@media(min-width:740px){.partner-entry{grid-template-columns:minmax(0,1fr) auto;align-items:center;padding:21px 14px}.partner-entry-actions{display:flex;justify-content:flex-end;width:auto}.partner-entry-actions .mini{min-width:75px}}
+@media(max-width:720px){.app-main{padding-inline:18px}.partner-dashboard-head{padding:18px 22px!important;gap:12px}.partner-dashboard-intro{gap:10px}.partner-dashboard-intro p{font-size:13px}.partner-dashboard-head .soft-pill{font-size:12px;padding:9px 12px}.partner-main-grid .card,.partner-admin-card,.partner-overview{padding:24px!important}.partner-entry{padding:20px 2px}.partner-entry-actions{gap:10px}.scanner-panel{padding:17px}.scanner-status{font-size:14px;padding:15px 18px}}
+@media(max-width:375px){.partner-dashboard-head{align-items:flex-start}.partner-dashboard-intro p{font-size:12px}.partner-dashboard-head .soft-pill{padding:7px 9px}.partner-entry-actions{gap:7px}.partner-entry-actions .mini{font-size:13px;padding:12px 5px!important}}
