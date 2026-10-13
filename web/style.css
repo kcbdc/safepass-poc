@@ -702,3 +702,46 @@ body.partner-mode #app > nav.partner-bottom > button.active,body.partner-mode #a
   .desktop-top-nav{gap:2px;}
   .desktop-top-nav button,.partner-mode .desktop-top-nav button:not(.icon-button):not(.secondary){padding:10px 11px;font-size:13px;}
 }
+
+
+/* v0.9.8 — KOMSCO-inspired text-only desktop top navigation */
+@media (min-width:1024px){
+  .app-header{
+    width:100%!important;max-width:none!important;
+    min-height:88px!important;
+    padding:18px clamp(30px,4.5vw,88px)!important;
+    gap:clamp(28px,4vw,76px)!important;
+    background:linear-gradient(105deg,#102f50 0%,#19516f 52%,#164b63 100%)!important;
+    border:0!important;
+  }
+  .app-header .wordmark{color:#fff!important;font-weight:850!important;font-size:clamp(26px,2vw,33px)!important;letter-spacing:-.04em!important;}
+  .desktop-top-nav{
+    display:flex!important;align-items:center!important;justify-content:flex-end!important;
+    gap:clamp(18px,2.2vw,42px)!important;flex:1 1 auto!important;
+  }
+  .desktop-top-nav button,
+  .partner-mode .desktop-top-nav button:not(.icon-button):not(.secondary){
+    min-height:45px!important;padding:6px 2px!important;
+    color:rgba(255,255,255,.83)!important;background:transparent!important;
+    border:0!important;border-bottom:3px solid transparent!important;border-radius:0!important;
+    font-size:clamp(17px,1.1vw,21px)!important;font-weight:750!important;
+    line-height:1.35!important;white-space:nowrap!important;box-shadow:none!important;
+  }
+  .desktop-top-nav button:hover,
+  .partner-mode .desktop-top-nav button:hover:not(.icon-button):not(.secondary){color:#fff!important;}
+  .desktop-top-nav button.active,
+  .partner-mode .desktop-top-nav button.active,
+  .partner-mode .desktop-top-nav button.active:not(.icon-button):not(.secondary){
+    color:#fff!important;background:transparent!important;
+    border:0!important;border-bottom:3px solid #9ae1d9!important;
+  }
+  .desktop-top-nav .svg-icon{display:none!important;}
+  .app-header .header-actions .icon-button,
+  .partner-mode .app-header .header-actions .icon-button{color:#fff!important;}
+  .app-header .header-actions{gap:10px!important;}
+}
+@media (min-width:1024px) and (max-width:1199px){
+  .app-header{gap:20px!important;padding-inline:26px!important;}
+  .desktop-top-nav{gap:16px!important;}
+  .desktop-top-nav button,.partner-mode .desktop-top-nav button:not(.icon-button):not(.secondary){font-size:16px!important;}
+}
