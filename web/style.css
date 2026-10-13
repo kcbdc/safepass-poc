@@ -126,3 +126,27 @@ input,select{padding:14px 18px!important;line-height:1.4}button{line-height:1.35
 @media(min-width:740px){.partner-entry{grid-template-columns:minmax(0,1fr) auto;align-items:center;padding:21px 14px}.partner-entry-actions{display:flex;justify-content:flex-end;width:auto}.partner-entry-actions .mini{min-width:75px}}
 @media(max-width:720px){.app-main{padding-inline:18px}.partner-dashboard-head{padding:18px 22px!important;gap:12px}.partner-dashboard-intro{gap:10px}.partner-dashboard-intro p{font-size:13px}.partner-dashboard-head .soft-pill{font-size:12px;padding:9px 12px}.partner-main-grid .card,.partner-admin-card,.partner-overview{padding:24px!important}.partner-entry{padding:20px 2px}.partner-entry-actions{gap:10px}.scanner-panel{padding:17px}.scanner-status{font-size:14px;padding:15px 18px}}
 @media(max-width:375px){.partner-dashboard-head{align-items:flex-start}.partner-dashboard-intro p{font-size:12px}.partner-dashboard-head .soft-pill{padding:7px 9px}.partner-entry-actions{gap:7px}.partner-entry-actions .mini{font-size:13px;padding:12px 5px!important}}
+
+
+/* v0.6.5: bottom nav fixed to viewport bottom */
+#app{min-height:100dvh;display:flex;flex-direction:column}
+.app-main{flex:1 0 auto;padding-bottom:128px!important}
+footer{padding-bottom:112px!important}
+.bottom-nav,.partner-bottom{
+  position:fixed!important;
+  left:0; right:0; bottom:0;
+  width:min(100%,980px);
+  margin:0 auto!important;
+  z-index:40;
+  box-shadow:0 -8px 24px rgba(17,35,67,.08);
+}
+.bottom-nav{border-top:1px solid #e4ebf5;background:rgba(255,255,255,.96);backdrop-filter:saturate(1.1) blur(8px)}
+.partner-bottom{border-top:1px solid #dfeadf;background:rgba(255,255,255,.97);backdrop-filter:saturate(1.05) blur(8px)}
+@supports (padding: max(0px)){
+  .bottom-nav,.partner-bottom{padding-bottom:max(10px, env(safe-area-inset-bottom))}
+}
+@media(max-width:720px){
+  .app-main{padding-bottom:136px!important}
+  footer{padding-bottom:118px!important}
+  .bottom-nav,.partner-bottom{width:100%;border-radius:0}
+}
