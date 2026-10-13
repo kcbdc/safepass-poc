@@ -678,3 +678,27 @@ body.partner-mode #app > nav.partner-bottom > button.active,body.partner-mode #a
   .user-home-grid .user-welcome {padding:38px 46px;}
   .user-home-grid .request-step-card {padding:36px 46px;}
 }
+
+
+/* v0.9.7 Desktop header navigation — no duplicate mobile dock */
+.desktop-top-nav{display:none}
+@media (min-width:1024px){
+  .app-header{max-width:1560px!important;display:flex!important;align-items:center!important;gap:32px!important;padding:20px clamp(28px,3.5vw,64px)!important;}
+  .app-header .wordmark{flex:0 0 auto!important;min-width:max-content!important;white-space:nowrap!important;}
+  .desktop-top-nav{display:flex;align-items:center;justify-content:center;gap:8px;flex:1 1 auto;min-width:0;}
+  .desktop-top-nav button,.partner-mode .desktop-top-nav button:not(.icon-button):not(.secondary){display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:46px;padding:11px 17px;border-radius:14px;background:transparent!important;color:#63738b!important;border:1px solid transparent;font-size:15px;line-height:1.3;font-weight:700;white-space:nowrap;box-shadow:none!important;}
+  .desktop-top-nav .svg-icon,.desktop-top-nav .svg-icon.mini{display:inline-flex;flex:0 0 21px;width:21px;height:21px;align-items:center;justify-content:center;color:currentColor!important;}
+  .desktop-top-nav .svg-icon svg{width:21px;height:21px;stroke:currentColor;}
+  .desktop-top-nav button.active{background:#ecf3ff!important;color:#276bd0!important;border-color:#d5e4fb!important;}
+  .partner-mode .desktop-top-nav button.active,.partner-mode .desktop-top-nav button.active:not(.icon-button):not(.secondary){background:#e7f5ec!important;color:#187950!important;border-color:#cce7d8!important;}
+  .desktop-top-nav button:focus-visible{outline:3px solid #8db1e8;outline-offset:2px;}
+  .app-header .header-actions{flex:0 0 auto!important;margin-left:0!important;}
+  .bottom-nav,.partner-bottom{display:none!important;}
+  .app-main{padding-bottom:56px!important;}
+  footer{padding-bottom:24px!important;}
+}
+@media (min-width:1024px) and (max-width:1160px){
+  .app-header{gap:14px!important;padding-inline:22px!important;}
+  .desktop-top-nav{gap:2px;}
+  .desktop-top-nav button,.partner-mode .desktop-top-nav button:not(.icon-button):not(.secondary){padding:10px 11px;font-size:13px;}
+}
