@@ -71,8 +71,8 @@ export default {async fetch(req:Request,env:Env):Promise<Response>{
  if(!device||! /^[a-f0-9-]{36}$/i.test(device))return fail('Demo device ID required',401);
  if(path==='/api/request/create'){
   const partner=safeText(x.partner_id,50),item=safeText(x.item,100),hours=Number(x.hours);
-  if(!await approvedPartner(partner)||!item||!Number.isInteger(hours)||hours<1||hours>168)return fail('Invalid rental request');
-  const id=crypto.randomUUID(),nonce=crypto.randomUUID(),expires=new Date(Date.now()+Math.min(hours*3600000,24*3600000)).toISOString();
+  if(!await approvedPartner(partner)||!item||!(Number.isInteger(hours)&&hours>=1&&hours<=168 || Math.abs(hours-20/3600)<0.00000001))return fail('Invalid rental request');
+  const id=crypto.randomUUID(),nonce=crypto.randomUUID(),expires=new Date(Date.now()+Math.max(10*60000,Math.min(hours*3600000,24*3600000))).toISOString();
   const code=`SP1.${id}.${nonce}.${await sign(env.TOKEN_SECRET,`${id}.${nonce}`)}`;
   await env.DB.prepare('INSERT INTO rental_requests(id,partner_id,item,hours,request_code_hash,status,created_at,expires_at) VALUES(?,?,?,?,?,?,?,?)').bind(id,partner,item,hours,await sha(code),'REQUESTED',now(),expires).run();
   await audit(env.DB,'REQUEST_CREATED',id);return Response.json({rental_id:id,request_code:code});
@@ -117,7 +117,7 @@ export default {async fetch(req:Request,env:Env):Promise<Response>{
  }
  if(path==='/api/disclosure/request'){
   const id=safeText(x.rental_id,50),reason=safeText(x.reason,200);
-  const rental=await env.DB.prepare('SELECT id,expires_at,status FROM rental_requests WHERE id=?').bind(id).first<{id:string;expires_at:string;status:string}>();
+  const rental=await env.DB.prepare('SELECT r.id,r.status,t.expires_at FROM rental_requests r JOIN guarantee_tokens t ON t.rental_id=r.id WHERE r.id=?').bind(id).first<{id:string;expires_at:string;status:string}>();
   const owner=await env.DB.prepare('SELECT partner_id FROM rental_requests WHERE id=?').bind(id).first<{partner_id:string}>();
   if(!owner||!await approvedPartner(owner.partner_id))return fail('Partner authorization required',403);
   if(!rental||rental.status!=='ACTIVE'||rental.expires_at>now()||reason.length<5)return fail('Disclosure review only for overdue rentals',409);
