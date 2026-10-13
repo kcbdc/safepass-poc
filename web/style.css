@@ -526,7 +526,7 @@ footer{padding-bottom:112px!important}
 .qr-preview .qrcode{position:relative;z-index:1;margin:0;width:100%;min-height:auto}
 .qr-preview .qrcode img,.qr-preview .qrcode canvas{display:block;max-width:100%;height:auto!important;margin:0 auto}
 .qr-watermark{position:absolute;inset:10px;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:2;overflow:hidden}
-.qr-watermark span{display:block;transform:rotate(-28deg);font-size:20px;line-height:1.95;font-weight:700;letter-spacing:.04em;color:rgba(16,41,85,.14);text-align:center;white-space:nowrap;user-select:none}
+.qr-watermark span{display:block;transform:rotate(-28deg);font-size:13px;line-height:1.1;font-weight:500;letter-spacing:.025em;color:rgba(70,77,90,.13);text-align:center;white-space:nowrap;user-select:none;max-width:none}
 .qr-code-value{word-break:break-all;text-align:center;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px;color:#536b89}
 .scanner-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 .scanner-actions button{width:100%;min-height:50px}
@@ -536,5 +536,5 @@ footer{padding-bottom:112px!important}
 @media(max-width:640px){
   .scanner-actions{grid-template-columns:1fr}
   .qr-preview{width:min(248px,100%)}
-  .qr-watermark span{font-size:17px;line-height:1.88}
+  .qr-watermark span{font-size:12px;line-height:1.1}
 }
