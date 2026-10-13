@@ -235,3 +235,12 @@ footer{padding-bottom:112px!important}
   .partner-mode .partner-bottom .svg-icon svg{width:26px!important;height:26px!important}
   .partner-mode .partner-bottom button>span:last-child{font-size:15px!important}
 }
+
+
+/* v0.6.9: touch-friendly explicit consent control */
+.check{display:flex!important;align-items:flex-start!important;gap:16px!important;padding:18px 8px!important;cursor:pointer;line-height:1.65}
+.check input[type="checkbox"]{appearance:none;-webkit-appearance:none;flex:0 0 26px!important;width:26px!important;height:26px!important;min-width:26px!important;min-height:26px!important;margin:2px 0 0!important;padding:0!important;border:2px solid #8ca7c5!important;border-radius:7px!important;background:#fff;display:grid;place-items:center;cursor:pointer}
+.check input[type="checkbox"]:checked{background-color:#286bd5!important;border-color:#286bd5!important}
+.check input[type="checkbox"]:checked::after{content:"";display:block;width:7px;height:12px;border:solid white;border-width:0 3px 3px 0;transform:rotate(45deg) translate(-1px,-1px)}
+.check input[type="checkbox"]:focus-visible{outline:3px solid #aac6ff;outline-offset:3px}
+.check span{flex:1;min-width:0;line-height:1.65;word-break:keep-all;overflow-wrap:break-word}
