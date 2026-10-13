@@ -110,7 +110,7 @@ export default {async fetch(req:Request,env:Env):Promise<Response>{
   const holder=!!device&&row.holder_pseudonym===await sha(device);
   if(!holder&&!await approvedPartner(row.partner_id))return fail('Not authorized for rental',403);
   const valid=row.status==='ACTIVE'&&row.token_status==='ACTIVE'&&row.token_expires>now();
-  return Response.json({rental_id:id,item:row.item,status:row.status,token_status:row.token_status||'NOT_ISSUED',valid,expires_at:row.token_expires||row.expires_at});
+  return Response.json({rental_id:id,item:row.item,status:row.status,display_status:row.status==='ACTIVE'&&row.token_status==='ACTIVE'&&!valid?'STANDBY':row.status,token_status:row.token_status||'NOT_ISSUED',valid,expires_at:row.token_expires||row.expires_at});
  }
  if(path==='/api/token/verify'){
   const id=safeText(x.rental_id,50);
