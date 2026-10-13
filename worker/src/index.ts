@@ -26,15 +26,6 @@ export default {async fetch(req:Request,env:Env):Promise<Response>{
   return !!record&&record.status==='APPROVED'&&record.key_hash===await sha(key);
  }
  // Allow only the holder of the original demo device to read that device's audit trail.
- if(path==='/api/user/rentals'&&req.method==='GET'){
-   const demoDevice=safeText(req.headers.get('X-Demo-Device'),60);
-   if(!/^[a-f0-9-]{36}$/i.test(demoDevice))return fail('Demo device ID required',401);
-   const holder=await sha(demoDevice);
-   const result=await env.DB.prepare(`SELECT r.id AS rental_id,r.partner_id,r.item,r.status,t.id AS token_id,t.issued_at,t.expires_at,t.status AS token_status
-      FROM guarantee_tokens t JOIN rental_requests r ON r.id=t.rental_id
-      WHERE t.holder_pseudonym=? ORDER BY t.issued_at DESC LIMIT 200`).bind(holder).all();
-   return Response.json({rentals:result.results||[]});
- }
  if(path==='/api/user/access-history'&&req.method==='GET'){
   const deviceId=safeText(req.headers.get('X-Demo-Device'),60);
   if(!/^[a-f0-9-]{36}$/i.test(deviceId))return fail('Demo device ID required',401);
@@ -137,14 +128,6 @@ export default {async fetch(req:Request,env:Env):Promise<Response>{
   await audit(env.DB,'PARTNER_REGISTERED',null,id);return Response.json({partner_id:id,status:'PENDING',partner_key:secret});
  }
  if(!device||! /^[a-f0-9-]{36}$/i.test(device))return fail('Demo device ID required',401);
- if(path==='/api/partner/rentals'&&req.method==='POST'){
-   const partnerId=safeText(x.partner_id,50);
-   if(!await approvedPartner(partnerId))return fail('Not authorized for partner',403);
-   const result=await env.DB.prepare(`SELECT r.id AS rental_id,r.item,r.status,r.created_at,COALESCE(t.expires_at,r.expires_at) AS expires_at,t.issued_at,t.status AS token_status
-     FROM rental_requests r LEFT JOIN guarantee_tokens t ON t.rental_id=r.id
-     WHERE r.partner_id=? ORDER BY r.created_at DESC LIMIT 200`).bind(partnerId).all();
-   return Response.json({rentals:result.results||[]});
- }
  if(path==='/api/request/create'){
   const partner=safeText(x.partner_id,50),item=safeText(x.item,100),hours=Number(x.hours);
   if(!await approvedPartner(partner)||!item||!(Number.isInteger(hours)&&hours>=1&&hours<=168 || Math.abs(hours-20/3600)<0.00000001))return fail('Invalid rental request');

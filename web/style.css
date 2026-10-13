@@ -755,14 +755,3 @@ body.partner-mode #app > nav.partner-bottom > button.active,body.partner-mode #a
 .history-event-item{margin:12px 0;color:#334e6c;overflow-wrap:anywhere;font-size:14px}
 .history-event small{color:#78899e;line-height:1.55}
 @media(max-width:560px){.history-event{padding:16px}.history-event-top{display:grid;gap:6px}}
-
-/* v1.1: true multi-rental lists */
-.multi-rental-card{border:1px solid #dfe7f0;border-radius:18px;padding:18px;margin:12px 0;background:#f8fbff;min-width:0}
-.multi-rental-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;flex-wrap:wrap}
-.multi-rental-line{display:flex;justify-content:space-between;gap:15px;padding:9px 0;border-top:1px solid #e8edf3;align-items:baseline}
-.multi-rental-line span:last-child{overflow-wrap:anywhere;text-align:right;color:#526984;font-size:13px}
-.partner-rentals-summary{margin-top:20px}.partner-rentals-summary h3{margin:0 0 12px}
-.partner-rental-list{display:grid;gap:8px;max-height:330px;overflow:auto}
-.partner-rental-option{display:grid;grid-template-columns:1fr auto;gap:5px;align-items:center;background:#f3faf6!important;color:#174d3f!important;text-align:left;padding:12px 14px!important;border:1px solid #d9e9df;border-radius:13px}
-.partner-rental-option small{grid-column:1/-1;color:#71857a}
-@media(max-width:480px){.multi-rental-line{align-items:flex-start;flex-direction:column;gap:3px}.multi-rental-line span:last-child{text-align:left}}
