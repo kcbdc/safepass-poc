@@ -377,3 +377,32 @@ footer{padding-bottom:112px!important}
 .partner-mode footer{padding-bottom:195px!important}
 
 /* v0.8.5: partner SVG icons 30% smaller than v0.8.4 (65px x 0.7). */
+
+/* v0.8.6: precise partner nav icons + clear card separation */
+.partner-mode .partner-bottom>button>.svg-icon,
+.partner-mode .partner-bottom>button>.svg-icon.mini,
+.partner-mode .partner-bottom>button>.svg-icon svg {
+  width:35px!important;
+  height:35px!important;
+  min-width:35px!important;
+  min-height:35px!important;
+  flex:0 0 35px!important;
+}
+.partner-mode .partner-bottom>button>.svg-icon svg {
+  display:block!important;
+  stroke:currentColor!important;
+}
+/* Distinct header summary and dashboard cards; no touching borders. */
+.partner-mode .partner-dashboard-head {
+  margin-bottom:20px!important;
+  border-bottom:1px solid #e4e6eb!important;
+  border-radius:28px!important;
+}
+.partner-mode .partner-overview {
+  margin-top:0!important;
+  margin-bottom:24px!important;
+  border-radius:28px!important;
+}
+@media (max-width:720px){
+  .partner-mode .partner-dashboard-head{margin-bottom:18px!important;}
+}
