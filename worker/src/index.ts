@@ -1,4 +1,4 @@
-interface Env{DB:D1Database;ADMIN_KEY:string;TOKEN_SECRET:string;ALLOWED_ORIGIN:string}
+interface Env{DB:D1Database;ADMIN_KEY:string;TOKEN_SECRET:string;ALLOWED_ORIGIN:string;DEMO_TOOLS_ENABLED?:string}
 const enc=new TextEncoder();
 const hex=(bytes:ArrayBuffer)=>Array.from(new Uint8Array(bytes),b=>b.toString(16).padStart(2,'0')).join('');
 async function sha(s:string){return hex(await crypto.subtle.digest('SHA-256',enc.encode(s)))}
@@ -22,7 +22,27 @@ async function checkLimit(db:D1Database,key:string,limit:number,windowMinutes:nu
 function fail(msg:string,status=400){return new Response(JSON.stringify({error:msg}),{status,headers:{'Content-Type':'application/json; charset=utf-8'}})}
 function safeText(v:unknown,max=120){return typeof v==='string'?v.trim().slice(0,max):''}
 async function body(r:Request){return await r.json() as Record<string,unknown>}
-async function audit(db:D1Database,t:string,id:string|null,detail=''){await db.prepare('INSERT INTO audit_events(id,event_type,rental_id,at,detail) VALUES(?,?,?,?,?)').bind(crypto.randomUUID(),t,id,now(),detail).run()}
+async function audit(db:D1Database,t:string,id:string|null,detail=''){
+ const eventId=crypto.randomUUID(),at=now();
+ // Legacy audit table is retained. The companion hash ledger is append-only for the PoC.
+ const previous=await db.prepare('SELECT entry_hash FROM audit_integrity ORDER BY seq DESC LIMIT 1').first<{entry_hash:string}>();
+ const prevHash=previous?.entry_hash||'GENESIS';
+ const entryHash=await sha(JSON.stringify([prevHash,eventId,t,id,at,detail]));
+ await db.batch([
+  db.prepare('INSERT INTO audit_events(id,event_type,rental_id,at,detail) VALUES(?,?,?,?,?)').bind(eventId,t,id,at,detail),
+  db.prepare('INSERT INTO audit_integrity(event_id,event_type,rental_id,at,detail,previous_hash,entry_hash) VALUES(?,?,?,?,?,?,?)').bind(eventId,t,id,at,detail,prevHash,entryHash)
+ ]);
+}
+async function verifyAudit(db:D1Database){
+ const rows=await db.prepare('SELECT seq,event_id,event_type,rental_id,at,detail,previous_hash,entry_hash FROM audit_integrity ORDER BY seq ASC LIMIT 10000').all<Record<string,any>>();
+ let prior='GENESIS';let verified=0;
+ for(const row of rows.results||[]){
+  const actual=await sha(JSON.stringify([prior,row.event_id,row.event_type,row.rental_id,row.at,row.detail]));
+  if(row.previous_hash!==prior||row.entry_hash!==actual)return {valid:false,checked:verified,failed_seq:row.seq};
+  prior=row.entry_hash;verified++;
+ }
+ return {valid:true,checked:verified,head:prior,note:'Sequential proof of integrity; chain append should be serialized under concurrent writes'};
+}
 export default {async fetch(req:Request,env:Env):Promise<Response>{
  const origin=req.headers.get('Origin');const allowed=env.ALLOWED_ORIGIN;
  const cors:Record<string,string>={'Vary':'Origin','Access-Control-Allow-Headers':'Content-Type,X-Demo-Device,X-Admin-Key,X-Partner-Key','Access-Control-Allow-Methods':'GET,POST,OPTIONS'};
@@ -37,8 +57,8 @@ export default {async fetch(req:Request,env:Env):Promise<Response>{
  const key=safeText(req.headers.get('X-Partner-Key'),200);
  async function approvedPartner(partnerId:string){
   if(!key)return false;
-  const record=await env.DB.prepare('SELECT key_hash,status FROM partners WHERE id=?').bind(partnerId).first<{key_hash:string;status:string}>();
-  return !!record&&record.status==='APPROVED'&&secureEqual(record.key_hash,await sha(key));
+  const record=await env.DB.prepare('SELECT key_hash,status,created_at FROM partners WHERE id=?').bind(partnerId).first<{key_hash:string;status:string;created_at:string}>();
+  return !!record&&record.status==='APPROVED'&&(!partnerId.startsWith('demo-')||Date.now()-Date.parse(record.created_at)<3600000)&&secureEqual(record.key_hash,await sha(key));
  }
  // Allow only the holder of the original demo device to read that device's audit trail.
  if(path==='/api/user/rentals'&&req.method==='GET'){
@@ -71,6 +91,10 @@ export default {async fetch(req:Request,env:Env):Promise<Response>{
   return Response.json({events:[...unique.values()].sort((a,b)=>String(b.at).localeCompare(String(a.at))).slice(0,100),simulation:true});
  }
  if(path==='/api/demo/policies'&&req.method==='GET')return Response.json({policies:POLICIES,simulation:true});
+ if(path==='/api/admin/audit-integrity'&&req.method==='GET'){
+  if(!adminOK)return fail('Unauthorized',401);
+  return Response.json(await verifyAudit(env.DB));
+ }
  if(path==='/api/admin/metrics'&&req.method==='GET'){
   if(!adminOK)return fail('Unauthorized',401);
   const rows=await env.DB.prepare(`SELECT r.id,r.item,r.partner_id,r.created_at,
@@ -115,6 +139,18 @@ export default {async fetch(req:Request,env:Env):Promise<Response>{
  if(req.method!=='POST')return fail('Not found',404);
  if(origin&&origin!==allowed)return fail('Origin not allowed',403);
  const x=await body(req),device=safeText(req.headers.get('X-Demo-Device'),60);
+ if(path==='/api/admin/demo/setup'){
+  if(!adminOK)return fail('Unauthorized',401);
+  if(env.DEMO_TOOLS_ENABLED!=='true')return fail('Demo setup is disabled',403);
+  const ip=req.headers.get('CF-Connecting-IP')||'local';
+  if(!await checkLimit(env.DB,'seed:'+await sha(ip),5,60))return fail('Demo creation rate limited',429);
+  const partnerId='demo-'+crypto.randomUUID().replaceAll('-','').slice(0,14);
+  const secret=hex(crypto.getRandomValues(new Uint8Array(32)).buffer);
+  const created=now();
+  await env.DB.prepare('INSERT INTO partners(id,name,key_hash,status,created_at,approved_at) VALUES(?,?,?,?,?,?)').bind(partnerId,'SafePass 심사 시연용',await sha(secret),'APPROVED',created,created).run();
+  await audit(env.DB,'DEMO_PARTNER_CREATED',null,partnerId);
+  return Response.json({simulation:true,partner_id:partnerId,partner_key:secret,expires_in_minutes:60,notice:'시연 키는 한 번 표시합니다. 실운영에 사용하지 마세요.'});
+ }
  if(path==='/api/admin/partner/rotate-key'){
   if(!adminOK)return fail('Unauthorized',401);
   const id=safeText(x.partner_id,50);const secret=hex(crypto.getRandomValues(new Uint8Array(32)).buffer);
@@ -257,4 +293,14 @@ export default {async fetch(req:Request,env:Env):Promise<Response>{
  }catch(e){const msg=e instanceof Error?e.message:'Unknown error';if(msg.includes('UNIQUE constraint'))return fail('Already processed',409);return fail('Unexpected request or database error',500)}
  };
  const result=await response();const headers=new Headers(result.headers);for(const [k,v]of Object.entries(cors))headers.set(k,v);headers.set('Cache-Control','no-store');return new Response(result.body,{status:result.status,headers});
- }};
+ },
+ async scheduled(_event:{scheduledTime:number},env:Env):Promise<void>{
+  const oneWeek=new Date(Date.now()-7*86400000).toISOString();
+  const oneMonth=new Date(Date.now()-30*86400000).toISOString();
+  await env.DB.batch([
+   env.DB.prepare('DELETE FROM request_limits WHERE at < ?').bind(oneWeek),
+   env.DB.prepare('DELETE FROM demo_notices WHERE at < ?').bind(oneMonth)
+  ]);
+  await audit(env.DB,'DEMO_RETENTION_CLEANUP',null,'Purged temporary rate-limit events >7d and notices >30d; audit history preserved');
+ }
+ };
