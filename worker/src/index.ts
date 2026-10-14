@@ -110,6 +110,19 @@ export default {async fetch(req:Request,env:Env):Promise<Response>{
   const holder=await sha(deviceId);
   const rows=await env.DB.prepare(`SELECT n.id,n.rental_id,n.message,n.at FROM demo_notices n JOIN guarantee_tokens t ON t.rental_id=n.rental_id WHERE t.holder_pseudonym=? ORDER BY n.at DESC LIMIT 100`).bind(holder).all();return Response.json({notices:rows.results||[]});
  }
+ if(path==='/api/admin/rentals'&&req.method==='GET'){
+  if(!adminOK)return fail('Unauthorized',401);
+  const q=new URL(req.url).searchParams.get('id')?.trim()||'';
+  if(q && !/^[0-9a-f-]{1,36}$/i.test(q))return fail('Invalid rental ID',400);
+  const result=q
+    ?await env.DB.prepare(`SELECT r.id AS rental_id,r.partner_id,p.name AS partner_name,r.item,r.status AS rental_status,r.created_at,t.status AS token_status,t.expires_at
+       FROM rental_requests r LEFT JOIN partners p ON p.id=r.partner_id LEFT JOIN guarantee_tokens t ON t.rental_id=r.id
+       WHERE r.id LIKE ? ORDER BY r.created_at DESC LIMIT 100`).bind(q+'%').all()
+    :await env.DB.prepare(`SELECT r.id AS rental_id,r.partner_id,p.name AS partner_name,r.item,r.status AS rental_status,r.created_at,t.status AS token_status,t.expires_at
+       FROM rental_requests r LEFT JOIN partners p ON p.id=r.partner_id LEFT JOIN guarantee_tokens t ON t.rental_id=r.id
+       ORDER BY r.created_at DESC LIMIT 100`).all();
+  return Response.json({rentals:result.results||[],limit:100,simulation:true});
+ }
  if(path==='/api/admin/partners'&&req.method==='GET'){
   if(!adminOK)return fail('Unauthorized',401);
   const rows=await env.DB.prepare('SELECT id,name,status,created_at,approved_at FROM partners ORDER BY created_at DESC LIMIT 100').all();
