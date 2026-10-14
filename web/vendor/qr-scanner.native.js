@@ -1,0 +1,13 @@
+/* Local scanner adapter: browser BarcodeDetector API, no remote scripts */
+(function(){"use strict";
+class Html5Qrcode {
+ constructor(elementId){this.root=document.getElementById(elementId);this.stream=null;this.video=null;this.running=false;this.busy=false;this.timer=null;}
+ static supported(){return typeof BarcodeDetector!=='undefined'}
+ static async getCameras(){if(!this.supported())throw Error('이 브라우저에서는 내장 QR 스캔을 지원하지 않습니다. Android Chrome/Edge 최신 버전을 사용하거나 QR 요청 코드를 입력하세요.');if(!navigator.mediaDevices?.enumerateDevices)return [{id:'environment',label:'후면 카메라'}];const list=await navigator.mediaDevices.enumerateDevices();const out=list.filter(d=>d.kind==='videoinput').map(d=>({id:d.deviceId,label:d.label}));return out.length?out:[{id:'environment',label:'후면 카메라'}]}
+ async start(cameraId,config,onSuccess,onFailure){if(!Html5Qrcode.supported())throw Error('QR 인식 미지원 브라우저입니다. 최신 Chrome/Edge 또는 직접 입력을 사용하세요.');await this.stop();this.detector=new BarcodeDetector({formats:['qr_code']});const video=document.createElement('video');video.autoplay=true;video.muted=true;video.playsInline=true;video.setAttribute('playsinline','');video.style.cssText='width:100%;height:auto;display:block;max-height:420px;object-fit:cover';this.root.replaceChildren(video);this.video=video;try{const constraints={audio:false,video:cameraId==='environment'?{facingMode:{ideal:'environment'}}:{deviceId:cameraId?{ideal:cameraId}:undefined,facingMode:{ideal:'environment'}}};this.stream=await navigator.mediaDevices.getUserMedia(constraints);video.srcObject=this.stream;await video.play();this.running=true;const tick=async()=>{if(!this.running||this.busy||video.readyState<2)return;this.busy=true;try{const results=await this.detector.detect(video);if(results.length&&this.running)await onSuccess(results[0].rawValue)}catch(e){onFailure?.(String(e))}finally{this.busy=false}};this.timer=setInterval(tick,Math.max(150,1000/(config?.fps||8)))}catch(e){await this.stop();throw e}}
+ async scanFile(file){if(!Html5Qrcode.supported())throw Error('이 브라우저는 QR 이미지 인식을 지원하지 않습니다.');const detector=new BarcodeDetector({formats:['qr_code']});const bitmap=await createImageBitmap(file);try{const list=await detector.detect(bitmap);if(!list.length)throw Error('이미지에서 QR을 찾지 못했습니다.');return list[0].rawValue}finally{bitmap.close?.()}}
+ async stop(){this.running=false;if(this.timer){clearInterval(this.timer);this.timer=null}if(this.stream){this.stream.getTracks().forEach(t=>t.stop());this.stream=null}if(this.video){this.video.srcObject=null;this.video=null}}
+ async clear(){await this.stop();this.root?.replaceChildren()}
+}
+window.Html5Qrcode=Html5Qrcode;
+})();

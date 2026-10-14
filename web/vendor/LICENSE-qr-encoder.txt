@@ -1,0 +1,1 @@
+QR encoding algorithm by Kazuhiko Arase. MIT license. Bundled from npm qrcode-terminal vendor/QRCode.
