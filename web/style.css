@@ -766,3 +766,10 @@ body.partner-mode #app > nav.partner-bottom > button.active,body.partner-mode #a
 .partner-rental-option{display:grid;grid-template-columns:1fr auto;gap:5px;align-items:center;background:#f3faf6!important;color:#174d3f!important;text-align:left;padding:12px 14px!important;border:1px solid #d9e9df;border-radius:13px}
 .partner-rental-option small{grid-column:1/-1;color:#71857a}
 @media(max-width:480px){.multi-rental-line{align-items:flex-start;flex-direction:column;gap:3px}.multi-rental-line span:last-child{text-align:left}}
+
+/* v1.1.1: home previews only three most recent guarantees */
+.recent-guarantees-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.recent-guarantees-heading h2{margin:0}
+.recent-guarantees-heading>span{font-size:13px;color:#70819a;white-space:nowrap}
+.all-guarantees-button{width:100%;min-height:50px;margin-top:16px!important;border-radius:15px!important;font-weight:750!important}
+.issued-card #issued{display:grid;gap:12px;min-width:0}
