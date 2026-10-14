@@ -1,0 +1,10 @@
+import {copyFileSync,existsSync,mkdirSync} from 'node:fs';
+import {resolve} from 'node:path';
+const src=resolve('node_modules/jsqr/dist/jsQR.js');
+const dest=resolve('web/vendor/jsQR.local.js');
+if(!existsSync(src))throw Error('jsQR 설치 파일이 없습니다. npm install 후 빌드하세요.');
+mkdirSync(resolve('web/vendor'),{recursive:true});
+copyFileSync(src,dest);
+const license=resolve('node_modules/jsqr/LICENSE');
+if(existsSync(license))copyFileSync(license,resolve('web/vendor/LICENSE-jsQR.txt'));
+console.log('Bundled local QR decoder:',dest);

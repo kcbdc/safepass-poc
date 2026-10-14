@@ -1,0 +1,13 @@
+{
+  "name": "safepass-qr-local",
+  "private": true,
+  "version": "1.5.0",
+  "description": "Self-hosted QR decoding build for SafePass PoC",
+  "scripts": {
+    "build": "node scripts/vendor-qr.mjs",
+    "check:vendor": "node scripts/check-vendor.mjs"
+  },
+  "dependencies": {
+    "jsqr": "1.4.0"
+  }
+}
