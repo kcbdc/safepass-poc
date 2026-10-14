@@ -775,3 +775,27 @@ body.partner-mode #app > nav.partner-bottom > button.active,body.partner-mode #a
 .large-text .app-main p,.large-text .app-main label,.large-text .app-main button,.large-text .app-main input,.large-text .app-main select{font-size:18px!important;line-height:1.65}
 .large-text .app-main .sub,.large-text .app-main small{font-size:16px!important}
 @media (prefers-reduced-motion:reduce){.notice-marquee-track,.live-dot{animation:none!important}}
+
+/* v1.5.2 — QR camera framing guide (local decoder compatible) */
+.scanner-panel #reader{position:relative;isolation:isolate}
+.scanner-panel #reader:has(> video)::after{
+  content:"";
+  position:absolute;
+  left:50%;top:50%;transform:translate(-50%,-50%);
+  width:min(64%,248px);
+  aspect-ratio:1 / 1;
+  border:3px solid rgba(255,255,255,.98);
+  border-radius:17px;
+  box-sizing:border-box;
+  box-shadow:0 0 0 1px rgba(0,0,0,.22),0 0 22px rgba(255,255,255,.22),inset 0 0 20px rgba(255,255,255,.08);
+  pointer-events:none;
+  z-index:2;
+}
+.scanner-panel #reader:has(> video) video{width:100%!important;display:block}
+.scanner-panel .scanner-status{
+  text-align:center;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+@media(max-width:420px){.scanner-panel #reader:has(> video)::after{width:min(68%,220px);border-radius:14px}}
