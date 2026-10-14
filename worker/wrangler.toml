@@ -4,6 +4,7 @@ compatibility_date = "2026-10-01"
 
 [vars]
 ALLOWED_ORIGIN = "https://safepass-poc.pages.dev"
+DEMO_TOOLS_ENABLED = "true"
 
 [[d1_databases]]
 binding = "DB"
