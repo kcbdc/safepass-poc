@@ -6,9 +6,9 @@ async function sign(secret:string,message:string){const key=await crypto.subtle.
 const now=()=>new Date().toISOString();
 function secureEqual(a:string,b:string){const aa=enc.encode(a),bb=enc.encode(b);let v=aa.length^bb.length;for(let i=0;i<Math.max(aa.length,bb.length);i++)v|=(aa[i]||0)^(bb[i]||0);return v===0}
 const POLICIES:Record<string,{hours:number,limit?:number,period?:string,description:string}>={
- '자전거':{hours:3,description:'시연 정책: 3시간, 1인 1대'},
+ '자전거':{hours:3,description:'최대 3시간 · 동일 이용자 동시 1대'},
  '유모차':{hours:24,description:'시연 정책: 24시간'},
- '캠핑장비':{hours:168,description:'시연 정책: 최대 7일'},
+ '캠핑장비':{hours:336,description:'최대 14일(2주)'},
  '생활공구':{hours:72,description:'시연 정책: 3일'},
  '면접정장':{hours:96,limit:3,period:'year',description:'시연 정책: 4일·연 3회'},
  '한복':{hours:48,description:'시연 정책: 48시간'}
@@ -248,10 +248,10 @@ export default {async fetch(req:Request,env:Env):Promise<Response>{
   if(!await approvedPartner(partner))return fail('Partner is not approved',403);
   if(!policy)return fail('Invalid rental item',400);
   // 시연용 보증기간은 모든 품목에 동일하게 적용한다. 실제 시설의 대여한도와 독립적이다.
-  const allowedDurations=[3,24,48,72,96,168];
+  const allowedDurations=[3,24,48,72,96,168,336];
   if(!(allowedDurations.includes(hours)||Math.abs(hours-20/3600)<0.00000001))return fail('Invalid rental request or policy duration',400);
+  if(hours>policy.hours)return fail(`${item} 대여기간 초과: 최대 ${policy.hours}시간까지 가능합니다.`,409);
   if(!await checkLimit(env.DB,'create:'+partner,60,60))return fail('대여 생성 횟수 제한',429);
-  if(policy.limit){const start=new Date(new Date().getFullYear(),0,1).toISOString();const holder=safeText(x.demo_holder,60);if(holder){const n=await env.DB.prepare(`SELECT COUNT(*) n FROM rental_requests WHERE item=? AND partner_id=? AND created_at>=? AND demo_holder=?`).bind(item,partner,start,holder).first<{n:number}>();if((n?.n||0)>=policy.limit)return fail('시연용 연간 대여 횟수 초과',409)}}
   const id=crypto.randomUUID(),nonce=crypto.randomUUID(),expires=new Date(Date.now()+Math.max(10*60000,Math.min(hours*3600000,24*3600000))).toISOString();
   const code=`SP1.${id}.${nonce}.${await sign(env.TOKEN_SECRET,`${id}.${nonce}`)}`;
   await env.DB.prepare('INSERT INTO rental_requests(id,partner_id,item,hours,request_code_hash,status,created_at,expires_at,demo_holder) VALUES(?,?,?,?,?,?,?,?,?)').bind(id,partner,item,hours,await sha(code),'REQUESTED',now(),expires,safeText(x.demo_holder,60)).run();
@@ -263,11 +263,33 @@ export default {async fetch(req:Request,env:Env):Promise<Response>{
   const row=await env.DB.prepare('SELECT * FROM rental_requests WHERE id=? AND request_code_hash=?').bind(parts[1],await sha(code)).first<Record<string,any>>();
   if(!row||row.status!=='REQUESTED'||row.expires_at<=now())return fail('Request expired or used',409);
   if(path==='/api/request/inspect')return Response.json({rental_id:row.id,partner_name:row.partner_id,item:row.item,hours:row.hours});
+  const itemPolicy=POLICIES[String(row.item)];
+  if(!itemPolicy||Number(row.hours)>itemPolicy.hours)return fail(`${row.item} 최대 대여기간 ${itemPolicy?.hours||0}시간을 초과했습니다. 새 대여 QR을 요청하세요.`,409);
+  const holderHash=await sha(device);
+  const yearStart=new Date(Date.UTC(new Date().getUTCFullYear(),0,1)).toISOString();
+  // D1's single UPDATE statement is the final issuance guard; a separate precheck alone races.
+  let issueGuard='';let guardArgs:unknown[]=[];
+  if(row.item==='자전거'){
+    issueGuard=` AND NOT EXISTS (SELECT 1 FROM guarantee_tokens gt JOIN rental_requests rr ON rr.id=gt.rental_id
+      WHERE gt.holder_pseudonym=? AND rr.item='자전거' AND rr.status='ACTIVE' AND gt.status='ACTIVE')`;
+    guardArgs=[holderHash];
+  }else if(row.item==='면접정장'){
+    issueGuard=` AND (SELECT COUNT(*) FROM guarantee_tokens gt JOIN rental_requests rr ON rr.id=gt.rental_id
+      WHERE gt.holder_pseudonym=? AND rr.item='면접정장' AND gt.issued_at>=?) < 3`;
+    guardArgs=[holderHash,yearStart];
+  }
   if(x.simulation_pin!=='1234')return fail('Simulation authentication failed',401);
   if(x.consent_accepted!==true||x.consent_version!=='2026-10-14-demo-v1')return fail('Updated demo consent required',422);
   const token_id=crypto.randomUUID(),expires=new Date(Date.now()+Number(row.hours)*3600000).toISOString(),token=await sign(env.TOKEN_SECRET,`${token_id}.${row.id}.${expires}`);
-  const batch=await env.DB.batch([env.DB.prepare("UPDATE rental_requests SET status='ACTIVE' WHERE id=? AND status='REQUESTED'").bind(row.id),env.DB.prepare("INSERT INTO guarantee_tokens(id,rental_id,holder_pseudonym,token_hash,status,issued_at,expires_at) SELECT ?,?,?,?,?,?,? WHERE EXISTS(SELECT 1 FROM rental_requests WHERE id=? AND status='ACTIVE')").bind(token_id,row.id,await sha(device),await sha(token),'ACTIVE',now(),expires,row.id)]);
-  if(batch[0].meta.changes!==1||batch[1].meta.changes!==1)return fail('Request already used',409);
+  const batch=await env.DB.batch([
+    env.DB.prepare(`UPDATE rental_requests SET status='ACTIVE' WHERE id=? AND status='REQUESTED' ${issueGuard}`).bind(row.id,...guardArgs),
+    env.DB.prepare("INSERT INTO guarantee_tokens(id,rental_id,holder_pseudonym,token_hash,status,issued_at,expires_at) SELECT ?,?,?,?,?,?,? WHERE EXISTS(SELECT 1 FROM rental_requests WHERE id=? AND status='ACTIVE')").bind(token_id,row.id,holderHash,await sha(token),'ACTIVE',now(),expires,row.id)
+  ]);
+  if(batch[0].meta.changes!==1||batch[1].meta.changes!==1){
+    if(row.item==='자전거')return fail('자전거 대여 한도 초과: 동일 이용자는 한 번에 1대만 대여할 수 있습니다. 기존 자전거를 반납한 뒤 다시 신청하세요.',409);
+    if(row.item==='면접정장')return fail('면접정장 이용 횟수 초과: 올해 발급 가능한 3회를 모두 사용했습니다. 반납해도 연간 횟수에 포함됩니다.',409);
+    return fail('대여 요청이 이미 사용되었거나 유효하지 않습니다.',409);
+  }
   await env.DB.prepare('INSERT INTO demo_consents(id,rental_id,holder_hash,version,agreed_at) VALUES(?,?,?,?,?)').bind(crypto.randomUUID(),row.id,await sha(device),'2026-10-14-demo-v1',now()).run();
   await audit(env.DB,'TOKEN_ISSUED',row.id);return Response.json({token_id,rental_id:row.id,expires_at:expires,status:'ACTIVE'});
  }
