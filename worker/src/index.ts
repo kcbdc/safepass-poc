@@ -232,7 +232,11 @@ export default {async fetch(req:Request,env:Env):Promise<Response>{
  if(path==='/api/request/create'){
   const partner=safeText(x.partner_id,50),item=safeText(x.item,100),hours=Number(x.hours);
   const policy=POLICIES[item];
-  if(!await approvedPartner(partner)||!policy||!(Number.isInteger(hours)&&hours>=1&&hours<=policy.hours || Math.abs(hours-20/3600)<0.00000001))return fail('Invalid rental request or policy duration');
+  if(!await approvedPartner(partner))return fail('Partner is not approved',403);
+  if(!policy)return fail('Invalid rental item',400);
+  // 시연용 보증기간은 모든 품목에 동일하게 적용한다. 실제 시설의 대여한도와 독립적이다.
+  const allowedDurations=[3,24,48,72,96,168];
+  if(!(allowedDurations.includes(hours)||Math.abs(hours-20/3600)<0.00000001))return fail('Invalid rental request or policy duration',400);
   if(!await checkLimit(env.DB,'create:'+partner,60,60))return fail('대여 생성 횟수 제한',429);
   if(policy.limit){const start=new Date(new Date().getFullYear(),0,1).toISOString();const holder=safeText(x.demo_holder,60);if(holder){const n=await env.DB.prepare(`SELECT COUNT(*) n FROM rental_requests WHERE item=? AND partner_id=? AND created_at>=? AND demo_holder=?`).bind(item,partner,start,holder).first<{n:number}>();if((n?.n||0)>=policy.limit)return fail('시연용 연간 대여 횟수 초과',409)}}
   const id=crypto.randomUUID(),nonce=crypto.randomUUID(),expires=new Date(Date.now()+Math.max(10*60000,Math.min(hours*3600000,24*3600000))).toISOString();
