@@ -1,17 +1,1 @@
-{
-  "name": "safepass-poc-api",
-  "private": true,
-  "type": "module",
-  "scripts": {
-    "dev": "wrangler dev",
-    "deploy": "wrangler deploy",
-    "db:local": "wrangler d1 execute safepass-poc-db --local --file=../migrations/0001_init.sql",
-    "db:remote": "wrangler d1 execute safepass-poc-db --remote --file=../migrations/0001_init.sql",
-    "db:local:upgrade": "wrangler d1 execute safepass-poc-db --local --file=../migrations/0002_partner_approval.sql",
-    "db:remote:upgrade": "wrangler d1 execute safepass-poc-db --remote --file=../migrations/0002_partner_approval.sql"
-  },
-  "devDependencies": {
-    "wrangler": "^4.0.0",
-    "typescript": "^5.5.4"
-  }
-}
+{"name":"safepass-poc-api","private":true,"type":"module","scripts":{"dev":"wrangler dev","deploy":"wrangler deploy","db:local":"wrangler d1 execute safepass-poc-db --local --file=../migrations/0001_init.sql","db:remote":"wrangler d1 execute safepass-poc-db --remote --file=../migrations/0001_init.sql"},"devDependencies":{"wrangler":"^4.0.0","typescript":"^5.5.4"}}

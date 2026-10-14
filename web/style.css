@@ -767,9 +767,11 @@ body.partner-mode #app > nav.partner-bottom > button.active,body.partner-mode #a
 .partner-rental-option small{grid-column:1/-1;color:#71857a}
 @media(max-width:480px){.multi-rental-line{align-items:flex-start;flex-direction:column;gap:3px}.multi-rental-line span:last-child{text-align:left}}
 
-/* v1.1.1: home previews only three most recent guarantees */
-.recent-guarantees-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
-.recent-guarantees-heading h2{margin:0}
-.recent-guarantees-heading>span{font-size:13px;color:#70819a;white-space:nowrap}
-.all-guarantees-button{width:100%;min-height:50px;margin-top:16px!important;border-radius:15px!important;font-weight:750!important}
-.issued-card #issued{display:grid;gap:12px;min-width:0}
+/* v1.2 accessibility and demo */
+.demo-toolkit{margin-top:24px;padding:22px;display:flex;flex-direction:column;gap:14px}
+.demo-toolkit .action{display:flex;flex-wrap:wrap;gap:12px}
+.demo-toolkit p{font-size:15px;line-height:1.7}
+.large-text .app-main{font-size:18px}
+.large-text .app-main p,.large-text .app-main label,.large-text .app-main button,.large-text .app-main input,.large-text .app-main select{font-size:18px!important;line-height:1.65}
+.large-text .app-main .sub,.large-text .app-main small{font-size:16px!important}
+@media (prefers-reduced-motion:reduce){.notice-marquee-track,.live-dot{animation:none!important}}
