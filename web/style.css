@@ -776,26 +776,12 @@ body.partner-mode #app > nav.partner-bottom > button.active,body.partner-mode #a
 .large-text .app-main .sub,.large-text .app-main small{font-size:16px!important}
 @media (prefers-reduced-motion:reduce){.notice-marquee-track,.live-dot{animation:none!important}}
 
-/* v1.5.2 — QR camera framing guide (local decoder compatible) */
-.scanner-panel #reader{position:relative;isolation:isolate}
-.scanner-panel #reader:has(> video)::after{
-  content:"";
-  position:absolute;
-  left:50%;top:50%;transform:translate(-50%,-50%);
-  width:min(64%,248px);
-  aspect-ratio:1 / 1;
-  border:3px solid rgba(255,255,255,.98);
-  border-radius:17px;
-  box-sizing:border-box;
-  box-shadow:0 0 0 1px rgba(0,0,0,.22),0 0 22px rgba(255,255,255,.22),inset 0 0 20px rgba(255,255,255,.08);
-  pointer-events:none;
-  z-index:2;
-}
-.scanner-panel #reader:has(> video) video{width:100%!important;display:block}
-.scanner-panel .scanner-status{
-  text-align:center;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-@media(max-width:420px){.scanner-panel #reader:has(> video)::after{width:min(68%,220px);border-radius:14px}}
+/* v1.5.4: make the judge demo setup discoverable in the management screen */
+.demo-toolkit-mount{display:block;width:100%;margin-top:20px}
+.demo-toolkit-mount .demo-toolkit{display:block!important;width:100%;box-sizing:border-box;margin:0;border:1px solid #d8e5e7;background:#f9fcfc}
+.demo-toolkit .action{display:flex;flex-wrap:wrap;gap:9px;margin:12px 0}
+.demo-toolkit .action button{flex:1 1 180px;min-height:44px}
+.demo-credentials:not([hidden]){display:block;margin:14px 0;padding:14px;border:1px solid #bfded1;border-radius:12px;background:#f0faf5;overflow-wrap:anywhere}
+.demo-credentials[hidden]{display:none!important}
+.demo-credentials input,.demo-credentials textarea{box-sizing:border-box;width:100%;font:inherit;margin:5px 0 10px}
+.demo-credentials h3{margin:0 0 10px}
