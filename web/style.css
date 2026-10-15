@@ -1062,3 +1062,137 @@ body.partner-mode #app > nav.partner-bottom > button.active,body.partner-mode #a
 }
 
 .judge-demo-notice{background:#e9f8f2!important;border:1px solid #b9dfd1!important;color:#256c5d!important;padding:13px 15px!important;margin:13px 0!important;line-height:1.6!important;border-radius:14px!important;}
+
+/* SafePass v1.6.3 — consistent spacing in UUID lookup and judge tools.
+   Scoped to the exact markup; no functional changes. */
+#adminRentalResults .admin-rental-entry {
+  padding:18px 17px 19px!important;
+  line-height:1.55!important;
+}
+#adminRentalResults .admin-rental-entry-head {
+  display:flex!important;
+  flex-wrap:wrap!important;
+  align-items:center!important;
+  column-gap:10px!important;
+  row-gap:6px!important;
+  margin-bottom:9px!important;
+}
+#adminRentalResults .admin-rental-entry .sub {
+  margin:0 0 13px!important;
+  line-height:1.65!important;
+  overflow-wrap:anywhere!important;
+}
+#adminRentalResults .admin-rental-uuid {
+  margin:0 0 17px!important;
+  line-height:1.65!important;
+  overflow-wrap:anywhere!important;
+  word-break:break-word!important;
+}
+#adminRentalResults .admin-rental-buttons {
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) minmax(0,1.65fr)!important;
+  align-items:stretch!important;
+  gap:12px!important;
+  margin:0!important;
+  padding:0!important;
+  width:100%!important;
+}
+#adminRentalResults .admin-rental-buttons > button {
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  box-sizing:border-box!important;
+  width:100%!important;
+  min-width:0!important;
+  max-width:none!important;
+  min-height:46px!important;
+  height:auto!important;
+  margin:0!important;
+  padding:11px 12px!important;
+  border-radius:12px!important;
+  font-size:14px!important;
+  line-height:1.4!important;
+  white-space:normal!important;
+  word-break:keep-all!important;
+  text-align:center!important;
+}
+/* Judge toolkit: every row starts with clear breathing room. */
+#demoToolkit > p {
+  margin:0 0 12px!important;
+  line-height:1.75!important;
+  word-break:keep-all!important;
+  overflow-wrap:break-word!important;
+}
+#demoToolkit > .action {
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  column-gap:12px!important;
+  row-gap:12px!important;
+  align-items:stretch!important;
+  margin:14px 0 20px!important;
+  padding:0!important;
+  width:100%!important;
+}
+#demoToolkit > .action > button {
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  box-sizing:border-box!important;
+  flex:none!important;
+  min-width:0!important;
+  max-width:none!important;
+  width:100%!important;
+  min-height:48px!important;
+  height:auto!important;
+  margin:0!important;
+  padding:12px 13px!important;
+  border-radius:12px!important;
+  line-height:1.5!important;
+  white-space:normal!important;
+  word-break:keep-all!important;
+  text-align:center!important;
+}
+/* Metrics download remains a deliberately full-width action. */
+#demoToolkit > .action > #demoExport {grid-column:1 / -1!important}
+/* Seed and audit are exactly equal in width and height. */
+#demoToolkit > .action > #demoSeed,
+#demoToolkit > .action > #demoAudit {
+  grid-column:auto!important;
+  width:100%!important;
+  min-width:0!important;
+  align-self:stretch!important;
+}
+#demoToolkit > #demoLargeText {
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  box-sizing:border-box!important;
+  width:100%!important;
+  max-width:100%!important;
+  min-height:46px!important;
+  padding:11px 14px!important;
+  margin:0!important;
+  line-height:1.45!important;
+}
+#demoToolkit > #demoResults {margin:2px 0 18px!important;line-height:1.65!important}
+@media(max-width:480px) {
+  #adminRentalResults .admin-rental-entry {padding:17px 14px 18px!important}
+  #adminRentalResults .admin-rental-buttons {gap:12px!important}
+  #adminRentalResults .admin-rental-buttons > button {
+    font-size:clamp(12px,3.25vw,14px)!important;
+    padding:11px 8px!important;
+    min-height:46px!important;
+  }
+  #demoToolkit > .action {column-gap:12px!important;row-gap:12px!important}
+  #demoToolkit > .action > button {
+    font-size:clamp(12px,3.3vw,14px)!important;
+    padding:11px 9px!important;
+    min-height:48px!important;
+  }
+}
+@media(max-width:340px) {
+  #adminRentalResults .admin-rental-buttons,
+  #demoToolkit > .action {grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px!important}
+  #adminRentalResults .admin-rental-buttons > button,
+  #demoToolkit > .action > button {font-size:12px!important;padding:10px 6px!important}
+}
