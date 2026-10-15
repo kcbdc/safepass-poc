@@ -1027,3 +1027,38 @@ body.partner-mode #app > nav.partner-bottom > button.active,body.partner-mode #a
 @media(max-width:320px) {
   #demoToolkit .demo-credentials > .action{grid-template-columns:1fr!important}
 }
+
+/* SafePass v1.6.2 — aligned paired actions and judge demo hint */
+@media (max-width: 767px) {
+  .admin-rental-entry .action,
+  .admin-rental-results .action,
+  #newRequest .action,
+  #requestDetail .action,
+  .demo-credentials .action,
+  #demoCredentials .action,
+  .request-step-card .action {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    column-gap: 12px !important;
+    row-gap: 12px !important;
+    align-items: stretch !important;
+  }
+  .admin-rental-entry .action > button,
+  .admin-rental-results .action > button,
+  #newRequest .action > button,
+  .demo-credentials .action > button,
+  #demoCredentials .action > button,
+  .request-step-card .action > button {
+    flex: 1 1 calc(50% - 6px) !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 12px 10px !important;
+    line-height: 1.35 !important;
+    box-sizing: border-box !important;
+  }
+  #requestDetail .action > button {margin: 0 !important;}
+  #rentalPolicyHint {padding: 12px 14px !important;line-height: 1.5 !important;overflow-wrap: anywhere;}
+}
+
+.judge-demo-notice{background:#e9f8f2!important;border:1px solid #b9dfd1!important;color:#256c5d!important;padding:13px 15px!important;margin:13px 0!important;line-height:1.6!important;border-radius:14px!important;}
