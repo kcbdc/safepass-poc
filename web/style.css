@@ -917,3 +917,113 @@ body.partner-mode #app > nav.partner-bottom > button.active,body.partner-mode #a
 @media(max-width:370px){.demo-toolkit .action{grid-template-columns:1fr!important}.demo-toolkit #demoExport,.demo-toolkit #demoSeed{grid-column:auto}}
 /* Fixed navigation should not obscure anchored form controls. */
 #inspect,#create{scroll-margin-top:110px;scroll-margin-bottom:150px}
+
+/* v1.6.1 — Consistent judge-demo credential card spacing and balanced actions.
+   Visual-only; preserves the partner ID/key fields and existing button handlers. */
+#demoToolkit .demo-credentials:not([hidden]) {
+  display:flex!important;
+  flex-direction:column;
+  gap:0;
+  width:100%;
+  min-width:0;
+  box-sizing:border-box;
+  padding:clamp(16px,3.5vw,24px)!important;
+  margin:18px 0 14px!important;
+  border:1px solid #c8e0d5;
+  border-radius:20px;
+  background:#f1faf5;
+  overflow:hidden;
+}
+#demoToolkit .demo-credentials h3 {
+  margin:0 0 18px!important;
+  color:#173d33;
+  font-size:clamp(17px,3.7vw,21px);
+  line-height:1.4;
+  letter-spacing:-.02em;
+}
+#demoToolkit .demo-credentials label {
+  display:block;
+  margin:0 0 9px!important;
+  padding:0!important;
+  font-size:clamp(13px,3vw,16px)!important;
+  font-weight:700;
+  color:#30485b;
+  line-height:1.5;
+  overflow-wrap:break-word;
+}
+#demoToolkit .demo-credentials input,
+#demoToolkit .demo-credentials textarea {
+  display:block;
+  width:100%!important;
+  min-width:0!important;
+  max-width:100%!important;
+  height:auto!important;
+  box-sizing:border-box!important;
+  margin:0 0 18px!important;
+  padding:13px 15px!important;
+  border:1px solid #cfdae1!important;
+  border-radius:14px!important;
+  background:#fff!important;
+  color:#263f53!important;
+  font-family:inherit;
+  font-weight:500;
+  font-size:clamp(13px,3.2vw,16px)!important;
+  line-height:1.6!important;
+  letter-spacing:0;
+  box-shadow:none!important;
+}
+#demoToolkit .demo-credentials input {min-height:50px!important;white-space:nowrap;text-overflow:ellipsis}
+#demoToolkit .demo-credentials textarea {
+  min-height:110px!important;
+  resize:vertical;
+  overflow-wrap:anywhere;
+  word-break:break-all;
+  white-space:pre-wrap;
+}
+#demoToolkit .demo-credentials > p {
+  margin:1px 0 16px!important;
+  padding:0!important;
+  font-size:clamp(13px,3.2vw,15px)!important;
+  line-height:1.75!important;
+  color:#637a83;
+  word-break:keep-all;
+  overflow-wrap:break-word;
+}
+#demoToolkit .demo-credentials > .action {
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:12px!important;
+  width:100%;
+  margin:0!important;
+  padding:0!important;
+  align-items:stretch;
+}
+#demoToolkit .demo-credentials > .action > button,
+.partner-mode #demoToolkit .demo-credentials > .action > button:not(.icon-button) {
+  display:flex!important;
+  align-items:center;
+  justify-content:center;
+  flex:none!important;
+  width:100%!important;
+  min-width:0!important;
+  min-height:52px!important;
+  height:auto!important;
+  padding:11px 10px!important;
+  margin:0!important;
+  border-radius:13px!important;
+  font-size:clamp(13px,3vw,15px)!important;
+  font-weight:700;
+  line-height:1.45!important;
+  white-space:normal!important;
+  word-break:keep-all;
+  overflow-wrap:break-word;
+  text-align:center;
+}
+@media(max-width:420px) {
+  #demoToolkit .demo-credentials:not([hidden]){padding:17px!important;border-radius:17px}
+  #demoToolkit .demo-credentials > .action{gap:10px!important}
+  #demoToolkit .demo-credentials > .action > button{padding:11px 8px!important}
+}
+@media(max-width:320px) {
+  #demoToolkit .demo-credentials > .action{grid-template-columns:1fr!important}
+}
