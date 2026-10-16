@@ -51,7 +51,7 @@ export default {async fetch(req:Request,env:Env):Promise<Response>{
  const response=async()=>{
  try{
  const path=new URL(req.url).pathname;
- if(path==='/health')return Response.json({service:'SafePass PoC',ok:!!env.DB,simulation:true});
+ if(path==='/health')return Response.json({service:'SafePass PoC',version:'1.7.1',partner_self_activation:true,ok:!!env.DB,simulation:true});
  if(!env.DB||!env.TOKEN_SECRET||!env.ADMIN_KEY||!env.ALLOWED_ORIGIN)return fail('Server configuration incomplete',503);
  const adminOK=!!env.ADMIN_KEY&&secureEqual(req.headers.get('X-Admin-Key')||'',env.ADMIN_KEY);
  const reviewerOK=!!env.REVIEWER_KEY&&env.REVIEWER_KEY!==env.ADMIN_KEY&&secureEqual(req.headers.get('X-Reviewer-Key')||'',env.REVIEWER_KEY);
@@ -59,7 +59,19 @@ export default {async fetch(req:Request,env:Env):Promise<Response>{
  async function approvedPartner(partnerId:string){
   if(!key)return false;
   const record=await env.DB.prepare('SELECT key_hash,status,created_at FROM partners WHERE id=?').bind(partnerId).first<{key_hash:string;status:string;created_at:string}>();
-  return !!record&&record.status==='APPROVED'&&(!partnerId.startsWith('demo-')||Date.now()-Date.parse(record.created_at)<3600000)&&secureEqual(record.key_hash,await sha(key));
+  if(!record||!secureEqual(record.key_hash,await sha(key)))return false;
+  // Keep administratively suspended/rejected partners blocked. Only a holder of the
+  // registered partner key may activate their own legacy PENDING registration.
+  if(record.status==='PENDING'){
+   const changed=await env.DB.prepare("UPDATE partners SET status='APPROVED' WHERE id=? AND status='PENDING' AND key_hash=?")
+    .bind(partnerId,record.key_hash).run();
+   if((changed.meta?.changes||0)>0)await audit(env.DB,'PARTNER_SELF_ACTIVATED',null,partnerId+'; valid partner key; legacy PENDING registration');
+   const current=await env.DB.prepare('SELECT status FROM partners WHERE id=?').bind(partnerId).first<{status:string}>();
+   if(current?.status!=='APPROVED')return false;
+  }else if(record.status!=='APPROVED')return false;
+  // Only judge-created temporary partners are limited to one hour.
+  if(/^demo-[a-f0-9]{14}$/.test(partnerId)&&Date.now()-Date.parse(record.created_at)>=3600000)return false;
+  return true;
  }
  // Allow only the holder of the original demo device to read that device's audit trail.
  if(path==='/api/user/rentals'&&req.method==='GET'){
@@ -264,7 +276,7 @@ export default {async fetch(req:Request,env:Env):Promise<Response>{
  if(path==='/api/request/create'){
   const partner=safeText(x.partner_id,50),item=safeText(x.item,100),hours=Number(x.hours);
   const policy=POLICIES[item];
-  if(!await approvedPartner(partner))return fail('Partner is not approved',403);
+  if(!await approvedPartner(partner))return fail('대여처 접근 키가 일치하지 않거나 관리자에 의해 중지·거절된 대여처입니다. 새 등록을 했다면 최신 Worker 배포도 확인하세요.',403);
   const judgeRecord=/^demo-[a-f0-9]{14}$/.test(partner)?await env.DB.prepare('SELECT name FROM partners WHERE id=?').bind(partner).first<{name:string}>():null;
   const judgeDemo=env.DEMO_TOOLS_ENABLED==='true'&&judgeRecord?.name==='SafePass 심사 시연용';
   if(!policy)return fail('Invalid rental item',400);
