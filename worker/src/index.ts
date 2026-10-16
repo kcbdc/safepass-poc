@@ -51,12 +51,12 @@ export default {async fetch(req:Request,env:Env):Promise<Response>{
  const response=async()=>{
  try{
  const path=new URL(req.url).pathname;
- if(path==='/health')return Response.json({service:'SafePass PoC',version:'1.7.4',partner_self_activation:true,ok:!!env.DB,simulation:true});
+ if(path==='/health')return Response.json({service:'SafePass PoC',version:'1.7.5',partner_self_activation:true,ok:!!env.DB,simulation:true});
  if(!env.DB||!env.TOKEN_SECRET||!env.ADMIN_KEY||!env.ALLOWED_ORIGIN)return fail('Server configuration incomplete',503);
  const adminOK=!!env.ADMIN_KEY&&secureEqual(req.headers.get('X-Admin-Key')||'',env.ADMIN_KEY);
  const reviewerOK=!!env.REVIEWER_KEY&&env.REVIEWER_KEY!==env.ADMIN_KEY&&secureEqual(req.headers.get('X-Reviewer-Key')||'',env.REVIEWER_KEY);
  if(path==='/api/partner/entry/verify'&&req.method==='POST'){const input=await body(req);if(!env.PARTNER_ENTRY_PASSWORD)return fail('대여자 진입 비밀번호가 설정되지 않았습니다. Worker에 PARTNER_ENTRY_PASSWORD Secret을 등록하세요.',503);const valid=secureEqual(String(input.password||''),env.PARTNER_ENTRY_PASSWORD);return valid?Response.json({ok:true}):fail('대여자 비밀번호가 올바르지 않습니다.',401)}
- if(path==='/api/reviewer/key/verify'&&req.method==='POST'){if(!adminOK)return fail('관리자 인증이 필요합니다.',401);return reviewerOK?Response.json({ok:true,role:'reviewer'}):fail('2단계 보호 키가 올바르지 않습니다.',401)}
+ if(path==='/api/reviewer/key/verify'&&req.method==='POST'){if(!adminOK)return fail('관리자 인증이 필요합니다. 통합관리에서 관리자 키를 다시 확인하세요.',401);if(!env.REVIEWER_KEY)return fail('Worker REVIEWER_KEY Secret이 설정되지 않았습니다.',503);if(env.REVIEWER_KEY===env.ADMIN_KEY)return fail('REVIEWER_KEY는 ADMIN_KEY와 달라야 합니다.',503);return reviewerOK?Response.json({ok:true,role:'reviewer'}):fail('2단계 보호 키가 일치하지 않습니다. Worker의 REVIEWER_KEY 설정과 입력값을 확인하세요.',401)}
  const key=safeText(req.headers.get('X-Partner-Key'),200);
  async function approvedPartner(partnerId:string){
   if(!key)return false;
