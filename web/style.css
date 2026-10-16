@@ -1197,11 +1197,20 @@ body.partner-mode #app > nav.partner-bottom > button.active,body.partner-mode #a
   #demoToolkit > .action > button {font-size:12px!important;padding:10px 6px!important}
 }
 
-/* v1.7: normal rentals stay lightweight; elevated disclosure requires independent review */
-.reviewer-key-box{margin:20px 0;padding:18px 20px;background:#f1f8f5;border:1px solid #c7e1d7;border-radius:18px;line-height:1.55}
-.reviewer-key-box h3{margin:0 0 10px;font-size:1.04rem;color:#183c37}
-.reviewer-key-box p{margin:0 0 12px;font-size:.92rem;color:#456258;line-height:1.7}
-.reviewer-key-box label{display:block;margin-bottom:7px;font-weight:700}
-.reviewer-key-box input{width:100%;min-height:45px;box-sizing:border-box;padding:10px 14px;border-radius:12px}
-.reviewer-key-box small{display:block;margin-top:8px;color:#5d736c}
-@media(max-width:600px){.reviewer-key-box{margin:18px 0;padding:16px}.partner-entry-actions{gap:12px;row-gap:12px}.partner-entry-actions button{margin:0}}
+/* v1.7.2 - comfortable spacing for rental IDs, search, and verification */
+#adminRentalLookup .admin-rental-search {display:flex!important;align-items:stretch!important;flex-wrap:wrap!important;gap:12px!important;margin:16px 0 22px!important;padding:0!important}
+#adminRentalLookup .admin-rental-search input {flex:1 1 100%!important;min-width:0!important;box-sizing:border-box!important;margin:0!important;padding:13px 16px!important;line-height:1.5!important}
+#adminRentalLookup .admin-rental-search button {min-width:112px!important;margin:0!important;padding:12px 18px!important;line-height:1.45!important}
+#adminRentalLookup .sub {margin:10px 0 16px!important;line-height:1.75!important}
+#adminRentalResults .admin-rental-entry {padding:20px 18px 22px!important;margin:0 0 16px!important;line-height:1.6!important}
+#adminRentalResults .admin-rental-entry-head {display:flex!important;align-items:center!important;flex-wrap:wrap!important;gap:10px!important;margin:0 0 12px!important}
+#adminRentalResults .admin-rental-entry .sub {margin:9px 0 13px!important;line-height:1.65!important}
+#adminRentalResults .admin-rental-uuid {display:block!important;margin:12px 0 17px!important;line-height:1.65!important;overflow-wrap:anywhere!important;word-break:break-word!important}
+#adminRentalResults .admin-rental-buttons {display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1.7fr)!important;gap:12px!important;margin-top:14px!important}
+#adminRentalResults .admin-rental-buttons button {min-width:0!important;width:100%!important;margin:0!important;padding:12px!important;min-height:48px!important;box-sizing:border-box!important;line-height:1.45!important}
+.partner-verify-card label[for="rental"],.partner-verify-card #rental {margin-bottom:0!important}
+.partner-verify-card #rental {padding:14px 16px!important;line-height:1.6!important}
+.partner-verify-card .action {display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:14px!important;margin:24px 0 22px!important;padding:0!important}
+.partner-verify-card .action>button {width:100%!important;min-width:0!important;max-width:none!important;margin:0!important;padding:13px 16px!important;min-height:49px!important;line-height:1.5!important;box-sizing:border-box!important}
+.partner-verify-card #partnerLive {margin:14px 0 6px!important;line-height:1.7!important;word-break:keep-all!important}
+@media(max-width:480px){#adminRentalLookup .admin-rental-search{gap:10px!important}#adminRentalLookup .admin-rental-search button{flex:1!important;min-width:0!important}#adminRentalResults .admin-rental-entry{padding:17px 16px 19px!important}#adminRentalResults .admin-rental-buttons{gap:12px!important}#adminRentalResults .admin-rental-buttons button{font-size:clamp(12px,3.3vw,14px)!important;padding:10px 9px!important}.partner-verify-card .action{gap:12px!important}.partner-verify-card .action>button{font-size:clamp(12px,3.4vw,15px)!important;padding:12px 8px!important}}
