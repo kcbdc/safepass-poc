@@ -1226,3 +1226,21 @@ body.partner-mode #app > nav.partner-bottom > button.active,body.partner-mode #a
 .reviewer-check-row button{width:auto;min-height:42px;max-width:260px;padding:10px 18px;}
 #reviewerCheckStatus{font-size:.9rem;color:#52736f;}
 @media(max-width:650px){.reviewer-check-row button{width:100%;max-width:none}.list-expand-controls{margin:14px 0 6px}}
+
+/* SafePass v1.7.9: 사용자·대여자 로고와 보증 발급 성공 애니메이션 */
+.app-header .wordmark{display:inline-flex!important;align-items:center!important;min-width:0!important;flex-shrink:1!important;line-height:1!important}
+.app-header .wordmark .safe-brand-logo{display:block;width:auto;height:34px;max-width:min(51vw,300px);object-fit:contain;object-position:left center}
+.partner-mode .app-header .wordmark .safe-brand-logo{height:32px;max-width:min(62vw,345px)}
+@media(min-width:1024px){.app-header .wordmark .safe-brand-logo{height:42px;max-width:320px}.partner-mode .app-header .wordmark .safe-brand-logo{height:39px;max-width:380px}}
+@media(max-width:390px){.app-header .wordmark .safe-brand-logo{height:29px;max-width:50vw}.partner-mode .app-header .wordmark .safe-brand-logo{height:27px;max-width:62vw}}
+.safepass-success-overlay{position:fixed;inset:0;z-index:99999;display:flex;justify-content:center;align-items:center;padding:24px;background:rgba(8,29,67,.57);backdrop-filter:blur(7px);animation:sp-in .18s ease-out}
+.safepass-success-card{box-sizing:border-box;width:min(100%,370px);padding:34px 28px 35px;border-radius:30px;background:#fff;text-align:center;box-shadow:0 24px 75px rgba(5,28,57,.25);display:flex;flex-direction:column;align-items:center;gap:12px;color:#102b55}
+.safepass-success-logo{width:170px;max-width:80%;height:auto;margin-bottom:4px}
+.safepass-success-visual{height:145px;width:116px;display:flex;justify-content:center;align-items:center;margin:0 auto;animation:sp-pop .35s ease-out both}
+.safepass-success-visual svg{height:145px;width:auto;max-width:100%}
+.safepass-success-check{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:#1da692;color:white;font-size:28px;font-weight:800;line-height:1;margin-top:-14px;box-shadow:0 5px 12px rgba(29,166,146,.23)}
+.safepass-success-card h2{font-size:clamp(22px,5vw,27px);margin:2px 0 0;color:#113260;line-height:1.3;letter-spacing:-.04em}
+.safepass-success-card p{font-size:15px;line-height:1.65;margin:0;color:#667c91}
+@keyframes sp-pop{from{transform:scale(.8);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes sp-in{from{opacity:0}to{opacity:1}}
+@media(prefers-reduced-motion:reduce){.safepass-success-overlay,.safepass-success-visual{animation:none}}
