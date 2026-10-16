@@ -1,4 +1,4 @@
-interface Env{DB:D1Database;ADMIN_KEY:string;TOKEN_SECRET:string;ALLOWED_ORIGIN:string;DEMO_TOOLS_ENABLED?:string}
+interface Env{DB:D1Database;ADMIN_KEY:string;TOKEN_SECRET:string;ALLOWED_ORIGIN:string;DEMO_TOOLS_ENABLED?:string;REVIEWER_KEY?:string}
 const enc=new TextEncoder();
 const hex=(bytes:ArrayBuffer)=>Array.from(new Uint8Array(bytes),b=>b.toString(16).padStart(2,'0')).join('');
 async function sha(s:string){return hex(await crypto.subtle.digest('SHA-256',enc.encode(s)))}
@@ -45,7 +45,7 @@ async function verifyAudit(db:D1Database){
 }
 export default {async fetch(req:Request,env:Env):Promise<Response>{
  const origin=req.headers.get('Origin');const allowed=env.ALLOWED_ORIGIN;
- const cors:Record<string,string>={'Vary':'Origin','Access-Control-Allow-Headers':'Content-Type,X-Demo-Device,X-Admin-Key,X-Partner-Key','Access-Control-Allow-Methods':'GET,POST,OPTIONS'};
+ const cors:Record<string,string>={'Vary':'Origin','Access-Control-Allow-Headers':'Content-Type,X-Demo-Device,X-Admin-Key,X-Partner-Key,X-Reviewer-Key','Access-Control-Allow-Methods':'GET,POST,OPTIONS'};
  if(origin&&allowed&&(allowed===origin))cors['Access-Control-Allow-Origin']=origin;
  if(req.method==='OPTIONS')return new Response(null,{status:204,headers:cors});
  const response=async()=>{
@@ -54,6 +54,7 @@ export default {async fetch(req:Request,env:Env):Promise<Response>{
  if(path==='/health')return Response.json({service:'SafePass PoC',ok:!!env.DB,simulation:true});
  if(!env.DB||!env.TOKEN_SECRET||!env.ADMIN_KEY||!env.ALLOWED_ORIGIN)return fail('Server configuration incomplete',503);
  const adminOK=!!env.ADMIN_KEY&&secureEqual(req.headers.get('X-Admin-Key')||'',env.ADMIN_KEY);
+ const reviewerOK=!!env.REVIEWER_KEY&&env.REVIEWER_KEY!==env.ADMIN_KEY&&secureEqual(req.headers.get('X-Reviewer-Key')||'',env.REVIEWER_KEY);
  const key=safeText(req.headers.get('X-Partner-Key'),200);
  async function approvedPartner(partnerId:string){
   if(!key)return false;
@@ -200,22 +201,40 @@ export default {async fetch(req:Request,env:Env):Promise<Response>{
   if(r.meta.changes!==1)return fail('Partner not found',404);
   await audit(env.DB,'PARTNER_'+action,null,id);return Response.json({partner_id:id,status:action});
  }
+ // 1st approval: administrator must not be able to perform the independent 2nd approval.
  if(path==='/api/admin/disclosure/decide'){
-  if(!adminOK)return fail('Unauthorized',401);
+  if(!adminOK)return fail('관리자 1차 인증이 필요합니다.',401);
   const id=safeText(x.case_id,60),decision=String(x.decision);
   if(!['APPROVED_FOR_REVIEW','REJECTED'].includes(decision))return fail('Invalid decision');
-  const result=await env.DB.prepare("UPDATE disclosure_requests SET status=?,reviewed_at=? WHERE id=? AND status='PENDING_REVIEW'").bind(decision,now(),id).run();
-  if(result.meta.changes!==1)return fail('Pending case not found',409);
-  const caseRow=await env.DB.prepare('SELECT rental_id FROM disclosure_requests WHERE id=?').bind(id).first<{rental_id:string}>();await audit(env.DB,'DISCLOSURE_'+decision,caseRow?.rental_id||null,id+'; no personal data released');
+  const next=decision==='REJECTED'?'REJECTED':'PENDING_SECOND_APPROVAL';
+  const result=await env.DB.prepare("UPDATE disclosure_requests SET status=?,reviewed_at=? WHERE id=? AND status='PENDING_REVIEW'").bind(next,now(),id).run();
+  if(result.meta.changes!==1)return fail('1차 심사 대기 건이 아닙니다.',409);
+  const caseRow=await env.DB.prepare('SELECT rental_id FROM disclosure_requests WHERE id=?').bind(id).first<{rental_id:string}>();
+  await audit(env.DB,decision==='REJECTED'?'DISCLOSURE_REJECTED':'DISCLOSURE_FIRST_APPROVED',caseRow?.rental_id||null,'No personal data released; independent reviewer required');
+  return Response.json({case_id:id,status:next,personal_data_released:false});
+ }
+ // 2nd approval: separate REVIEWER_KEY is required, not administrator credentials.
+ if(path==='/api/reviewer/disclosure/decide'){
+  if(!reviewerOK)return fail('별도 2차 검토자 인증이 필요합니다. REVIEWER_KEY를 확인하세요.',401);
+  const id=safeText(x.case_id,60),decision=String(x.decision);
+  if(!['APPROVED_FOR_REVIEW','REJECTED'].includes(decision))return fail('Invalid decision');
+  const result=await env.DB.prepare("UPDATE disclosure_requests SET status=?,reviewed_at=? WHERE id=? AND status='PENDING_SECOND_APPROVAL' AND EXISTS (SELECT 1 FROM rental_requests r JOIN guarantee_tokens t ON t.rental_id=r.id WHERE r.id=disclosure_requests.rental_id AND r.status='ACTIVE' AND t.status='ACTIVE' AND t.expires_at<=?)").bind(decision,now(),id,now()).run();
+  if(result.meta.changes!==1)return fail('2차 심사 대상이 아니거나 미반납 상태가 아닙니다.',409);
+  const caseRow=await env.DB.prepare('SELECT rental_id FROM disclosure_requests WHERE id=?').bind(id).first<{rental_id:string}>();
+  await audit(env.DB,decision==='REJECTED'?'DISCLOSURE_SECOND_REJECTED':'DISCLOSURE_SECOND_APPROVED',caseRow?.rental_id||null,'case='+id+'; independent reviewer decision; no personal data released');
   return Response.json({case_id:id,status:decision,personal_data_released:false});
  }
  // Demonstration-only identity reveal: fictitious profiles, never actual mobile ID data.
  if(path==='/api/admin/disclosure/demo-identity'&&req.method==='POST'){
   if(!adminOK)return fail('Unauthorized',401);
+  if(!reviewerOK)return fail('2차 검토자 키를 함께 입력해야 가상 신원을 열람할 수 있습니다.',401);
   const caseId=safeText(x.case_id,60);
   const row=await env.DB.prepare('SELECT d.id,d.rental_id,d.status,r.status rental_status,t.expires_at FROM disclosure_requests d JOIN rental_requests r ON r.id=d.rental_id JOIN guarantee_tokens t ON t.rental_id=r.id WHERE d.id=?').bind(caseId).first<{id:string;rental_id:string;status:string;rental_status:string;expires_at:string}>();
   if(!row)return fail('Review case not found',404);
   if(row.status!=='APPROVED_FOR_REVIEW'||row.rental_status!=='ACTIVE'||row.expires_at>now())return fail('Approved overdue case required',403);
+  // Legacy single-step approvals are not sufficient: require a recorded second reviewer decision for this case.
+  const second=await env.DB.prepare("SELECT id FROM audit_events WHERE event_type='DISCLOSURE_SECOND_APPROVED' AND rental_id=? AND detail LIKE ? LIMIT 1").bind(row.rental_id,'case='+caseId+';%').first();
+  if(!second)return fail('독립 2차 승인 기록이 없습니다. 기존 단독 승인 건은 재심사가 필요합니다.',403);
   // Stable synthetic profile selected from fictitious examples; only available after approval.
   const digest=await sha(row.rental_id);
   const profiles=[{name:'김안심 (가상)',phone:'010-0000-1001',birth:'1990-01-01',address:'가상시 안심구 1번지'}, {name:'이보증 (가상)',phone:'010-0000-1002',birth:'1994-05-12',address:'가상시 안심구 2번지'}, {name:'박대여 (가상)',phone:'010-0000-1003',birth:'1988-11-20',address:'가상시 안심구 3번지'}];
@@ -230,8 +249,8 @@ export default {async fetch(req:Request,env:Env):Promise<Response>{
   if(!/^[a-z0-9-]{4,50}$/.test(id)||name.length<2)return fail('Partner ID and name required');
   // Generate a unique 256-bit secret on the server; never persist plaintext.
   const secret=hex(crypto.getRandomValues(new Uint8Array(32)).buffer);
-  await env.DB.prepare('INSERT INTO partners(id,name,key_hash,status,created_at) VALUES(?,?,?,?,?)').bind(id,name,await sha(secret),'PENDING',now()).run();
-  await audit(env.DB,'PARTNER_REGISTERED',null,id);return Response.json({partner_id:id,status:'PENDING',partner_key:secret});
+  await env.DB.prepare('INSERT INTO partners(id,name,key_hash,status,created_at) VALUES(?,?,?,?,?)').bind(id,name,await sha(secret),'APPROVED',now()).run();
+  await audit(env.DB,'PARTNER_SELF_REGISTERED',null,id+'; PoC auto-activated, key verification still required');return Response.json({partner_id:id,status:'APPROVED',partner_key:secret,notice:'PoC 등록 즉시 이용 가능 · 미반납 가상 신원 열람은 별도 2단계 승인'});
  }
  if(!device||! /^[a-f0-9-]{36}$/i.test(device))return fail('Demo device ID required',401);
  if(path==='/api/partner/rentals'&&req.method==='POST'){

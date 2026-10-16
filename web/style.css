@@ -1196,3 +1196,12 @@ body.partner-mode #app > nav.partner-bottom > button.active,body.partner-mode #a
   #adminRentalResults .admin-rental-buttons > button,
   #demoToolkit > .action > button {font-size:12px!important;padding:10px 6px!important}
 }
+
+/* v1.7: normal rentals stay lightweight; elevated disclosure requires independent review */
+.reviewer-key-box{margin:20px 0;padding:18px 20px;background:#f1f8f5;border:1px solid #c7e1d7;border-radius:18px;line-height:1.55}
+.reviewer-key-box h3{margin:0 0 10px;font-size:1.04rem;color:#183c37}
+.reviewer-key-box p{margin:0 0 12px;font-size:.92rem;color:#456258;line-height:1.7}
+.reviewer-key-box label{display:block;margin-bottom:7px;font-weight:700}
+.reviewer-key-box input{width:100%;min-height:45px;box-sizing:border-box;padding:10px 14px;border-radius:12px}
+.reviewer-key-box small{display:block;margin-top:8px;color:#5d736c}
+@media(max-width:600px){.reviewer-key-box{margin:18px 0;padding:16px}.partner-entry-actions{gap:12px;row-gap:12px}.partner-entry-actions button{margin:0}}
