@@ -1244,3 +1244,9 @@ body.partner-mode #app > nav.partner-bottom > button.active,body.partner-mode #a
 @keyframes sp-pop{from{transform:scale(.8);opacity:0}to{transform:scale(1);opacity:1}}
 @keyframes sp-in{from{opacity:0}to{opacity:1}}
 @media(prefers-reduced-motion:reduce){.safepass-success-overlay,.safepass-success-visual{animation:none}}
+
+/* v1.8.0: 사용자 첨부 공식 로고 적용 (원본 비율 유지) */
+.app-header .wordmark .safe-brand-logo{height:38px;max-width:min(58vw,315px);object-fit:contain;object-position:left center}
+.partner-mode .app-header .wordmark .safe-brand-logo{height:35px;max-width:min(65vw,375px)}
+@media(min-width:1024px){.app-header .wordmark .safe-brand-logo{height:46px;max-width:360px}.partner-mode .app-header .wordmark .safe-brand-logo{height:43px;max-width:420px}}
+@media(max-width:390px){.app-header .wordmark .safe-brand-logo{height:32px;max-width:54vw}.partner-mode .app-header .wordmark .safe-brand-logo{height:29px;max-width:64vw}}
