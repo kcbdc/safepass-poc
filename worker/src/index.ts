@@ -51,7 +51,7 @@ export default {async fetch(req:Request,env:Env):Promise<Response>{
  const response=async()=>{
  try{
  const path=new URL(req.url).pathname;
- if(path==='/health')return Response.json({service:'SafePass PoC',version:'1.7.1',partner_self_activation:true,ok:!!env.DB,simulation:true});
+ if(path==='/health')return Response.json({service:'SafePass PoC',version:'1.7.3',partner_self_activation:true,ok:!!env.DB,simulation:true});
  if(!env.DB||!env.TOKEN_SECRET||!env.ADMIN_KEY||!env.ALLOWED_ORIGIN)return fail('Server configuration incomplete',503);
  const adminOK=!!env.ADMIN_KEY&&secureEqual(req.headers.get('X-Admin-Key')||'',env.ADMIN_KEY);
  const reviewerOK=!!env.REVIEWER_KEY&&env.REVIEWER_KEY!==env.ADMIN_KEY&&secureEqual(req.headers.get('X-Reviewer-Key')||'',env.REVIEWER_KEY);
@@ -143,14 +143,17 @@ export default {async fetch(req:Request,env:Env):Promise<Response>{
  }
  if(path==='/api/admin/disclosures'&&req.method==='GET'){
   if(!adminOK)return fail('Unauthorized',401);
-  const rows=await env.DB.prepare('SELECT d.id,d.rental_id,d.reason,d.status,d.created_at,d.reviewed_at,r.partner_id FROM disclosure_requests d JOIN rental_requests r ON r.id=d.rental_id ORDER BY d.created_at DESC LIMIT 100').all();
+  const rows=await env.DB.prepare(`SELECT d.id,d.rental_id,d.reason,d.status,d.created_at,d.reviewed_at,r.partner_id,
+   EXISTS(SELECT 1 FROM audit_events a WHERE a.rental_id=d.rental_id AND a.event_type='DISCLOSURE_SECOND_APPROVED' AND a.detail LIKE ('case=' || d.id || ';%')) AS second_approved
+   FROM disclosure_requests d JOIN rental_requests r ON r.id=d.rental_id ORDER BY d.created_at DESC LIMIT 100`).all();
   return Response.json({cases:rows.results});
  }
  if(path==='/api/admin/overdue'&&req.method==='GET'){
   if(!adminOK)return fail('Unauthorized',401);
   const rows=await env.DB.prepare(`SELECT r.id rental_id,r.partner_id,p.name partner_name,r.item,t.expires_at,
    (SELECT d.id FROM disclosure_requests d WHERE d.rental_id=r.id ORDER BY d.created_at DESC LIMIT 1) case_id,
-   (SELECT d.status FROM disclosure_requests d WHERE d.rental_id=r.id ORDER BY d.created_at DESC LIMIT 1) review_status
+   (SELECT d.status FROM disclosure_requests d WHERE d.rental_id=r.id ORDER BY d.created_at DESC LIMIT 1) review_status,
+   (SELECT EXISTS(SELECT 1 FROM audit_events a WHERE a.rental_id=d.rental_id AND a.event_type='DISCLOSURE_SECOND_APPROVED' AND a.detail LIKE ('case=' || d.id || ';%')) FROM disclosure_requests d WHERE d.rental_id=r.id ORDER BY d.created_at DESC LIMIT 1) second_approved
    FROM rental_requests r JOIN guarantee_tokens t ON t.rental_id=r.id
    LEFT JOIN partners p ON p.id=r.partner_id
    WHERE r.status='ACTIVE' AND t.status='ACTIVE' AND t.expires_at <= ?
@@ -219,7 +222,13 @@ export default {async fetch(req:Request,env:Env):Promise<Response>{
   const id=safeText(x.case_id,60),decision=String(x.decision);
   if(!['APPROVED_FOR_REVIEW','REJECTED'].includes(decision))return fail('Invalid decision');
   const next=decision==='REJECTED'?'REJECTED':'PENDING_SECOND_APPROVAL';
-  const result=await env.DB.prepare("UPDATE disclosure_requests SET status=?,reviewed_at=? WHERE id=? AND status='PENDING_REVIEW'").bind(next,now(),id).run();
+  // Legacy APPROVED_FOR_REVIEW records predate independent two-person review.
+  // Re-confirm as first reviewer, but never expose identity until a distinct second approval.
+  const legacy=await env.DB.prepare("SELECT d.id,d.rental_id FROM disclosure_requests d JOIN rental_requests r ON r.id=d.rental_id JOIN guarantee_tokens t ON t.rental_id=r.id WHERE d.id=? AND d.status='APPROVED_FOR_REVIEW' AND r.status='ACTIVE' AND t.status='ACTIVE' AND t.expires_at<=? AND NOT EXISTS (SELECT 1 FROM audit_events a WHERE a.rental_id=d.rental_id AND a.event_type='DISCLOSURE_SECOND_APPROVED' AND a.detail LIKE ('case=' || d.id || ';%'))").bind(id,now()).first();
+  if(legacy&&decision==='REJECTED')return fail('기존 승인 건은 먼저 1차 재확인을 진행하세요.',409);
+  const result=legacy
+   ?await env.DB.prepare("UPDATE disclosure_requests SET status='PENDING_SECOND_APPROVAL',reviewed_at=? WHERE id=? AND status='APPROVED_FOR_REVIEW'").bind(now(),id).run()
+   :await env.DB.prepare("UPDATE disclosure_requests SET status=?,reviewed_at=? WHERE id=? AND status='PENDING_REVIEW'").bind(next,now(),id).run();
   if(result.meta.changes!==1)return fail('1차 심사 대기 건이 아닙니다.',409);
   const caseRow=await env.DB.prepare('SELECT rental_id FROM disclosure_requests WHERE id=?').bind(id).first<{rental_id:string}>();
   await audit(env.DB,decision==='REJECTED'?'DISCLOSURE_REJECTED':'DISCLOSURE_FIRST_APPROVED',caseRow?.rental_id||null,'No personal data released; independent reviewer required');
