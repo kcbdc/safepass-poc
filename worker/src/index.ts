@@ -51,7 +51,7 @@ export default {async fetch(req:Request,env:Env):Promise<Response>{
  const response=async()=>{
  try{
  const path=new URL(req.url).pathname;
- if(path==='/health')return Response.json({service:'SafePass PoC',version:'1.7.5',partner_self_activation:true,ok:!!env.DB,simulation:true});
+ if(path==='/health')return Response.json({service:'SafePass PoC',version:'1.7.7',partner_self_activation:true,ok:!!env.DB,simulation:true});
  if(!env.DB||!env.TOKEN_SECRET||!env.ADMIN_KEY||!env.ALLOWED_ORIGIN)return fail('Server configuration incomplete',503);
  const adminOK=!!env.ADMIN_KEY&&secureEqual(req.headers.get('X-Admin-Key')||'',env.ADMIN_KEY);
  const reviewerOK=!!env.REVIEWER_KEY&&env.REVIEWER_KEY!==env.ADMIN_KEY&&secureEqual(req.headers.get('X-Reviewer-Key')||'',env.REVIEWER_KEY);
@@ -185,10 +185,17 @@ export default {async fetch(req:Request,env:Env):Promise<Response>{
  if(path==='/api/admin/partner/rotate-key'){
   if(!adminOK)return fail('Unauthorized',401);
   const id=safeText(x.partner_id,50);const secret=hex(crypto.getRandomValues(new Uint8Array(32)).buffer);
-  const r=await env.DB.prepare('UPDATE partners SET key_hash=? WHERE id=?').bind(await sha(secret),id).run();
-  if(r.meta.changes!==1)return fail('Partner not found',404);
-  await audit(env.DB,'PARTNER_KEY_ROTATED',null,id);
-  return Response.json({partner_id:id,partner_key:secret,notice:'이 키는 한 번만 표시됩니다. 이전 키는 즉시 폐기됩니다.'});
+  const existing=await env.DB.prepare('SELECT name,status FROM partners WHERE id=?').bind(id).first<{name:string;status:string}>();
+  if(!existing)return fail('Partner not found',404);
+  // Renew the short-lived judge credential on administrator-authorized key rotation.
+  // Historical rentals keep their original partner_id. Suspended/rejected partners remain blocked.
+  const judgeDemo=/^demo-[a-f0-9]{14}$/.test(id)&&existing.name==='SafePass 심사 시연용';
+  const r=judgeDemo
+   ?await env.DB.prepare('UPDATE partners SET key_hash=?,created_at=? WHERE id=?').bind(await sha(secret),now(),id).run()
+   :await env.DB.prepare('UPDATE partners SET key_hash=? WHERE id=?').bind(await sha(secret),id).run();
+  if(r.meta.changes!==1)return fail('Partner key update failed',500);
+  await audit(env.DB,judgeDemo?'DEMO_PARTNER_KEY_RENEWED':'PARTNER_KEY_ROTATED',null,id);
+  return Response.json({partner_id:id,partner_key:secret,expires_in_minutes:judgeDemo?60:null,notice:judgeDemo?'심사 시연용 접근 키가 새로 발급되었으며 60분 유효기간도 새로 시작합니다. 과거 대여 기록은 유지됩니다.':'이 키는 한 번만 표시됩니다. 이전 키는 즉시 폐기됩니다.'});
  }
  if(path==='/api/admin/notice/send'){
   if(!adminOK)return fail('Unauthorized',401);const id=safeText(x.rental_id,50);
@@ -278,7 +285,14 @@ export default {async fetch(req:Request,env:Env):Promise<Response>{
  if(!device||! /^[a-f0-9-]{36}$/i.test(device))return fail('Demo device ID required',401);
  if(path==='/api/partner/rentals'&&req.method==='POST'){
    const partnerId=safeText(x.partner_id,50);
-   if(!await approvedPartner(partnerId))return fail('Not authorized for partner',403);
+   if(!await approvedPartner(partnerId)){
+    // Explain demo expiration only after validating the supplied key, avoiding credential disclosure.
+    const candidate=await env.DB.prepare('SELECT name,key_hash,status,created_at FROM partners WHERE id=?').bind(partnerId).first<{name:string;key_hash:string;status:string;created_at:string}>();
+    if(candidate&&key&&secureEqual(candidate.key_hash,await sha(key))&&candidate.name==='SafePass 심사 시연용'&&/^demo-[a-f0-9]{14}$/.test(partnerId)&&Date.now()-Date.parse(candidate.created_at)>=3600000){
+     return fail('심사 시연용 대여처의 60분 사용기간이 만료됐습니다. 통합관리에서 해당 대여처의 접근 키를 초기화하면 60분 동안 다시 사용하고 기존 대여 기록도 조회할 수 있습니다.',403);
+    }
+    return fail('Not authorized for partner',403);
+   }
    const result=await env.DB.prepare(`SELECT r.id AS rental_id,r.item,r.status,r.created_at,COALESCE(t.expires_at,r.expires_at) AS expires_at,t.issued_at,t.status AS token_status
      FROM rental_requests r LEFT JOIN guarantee_tokens t ON t.rental_id=r.id
      WHERE r.partner_id=? ORDER BY r.created_at DESC LIMIT 200`).bind(partnerId).all();
