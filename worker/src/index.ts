@@ -145,9 +145,9 @@ export default {async fetch(req:Request,env:Env):Promise<Response>{
  }
  if(path==='/api/admin/disclosures'&&req.method==='GET'){
   if(!adminOK)return fail('Unauthorized',401);
-  const rows=await env.DB.prepare(`SELECT d.id,d.rental_id,d.reason,d.status,d.created_at,d.reviewed_at,r.partner_id,
+  const rows=await env.DB.prepare(`SELECT d.id,d.rental_id,d.reason,d.status,d.created_at,d.reviewed_at,r.partner_id,r.item,p.name AS partner_name,
    EXISTS(SELECT 1 FROM audit_events a WHERE a.rental_id=d.rental_id AND a.event_type='DISCLOSURE_SECOND_APPROVED' AND a.detail LIKE ('case=' || d.id || ';%')) AS second_approved
-   FROM disclosure_requests d JOIN rental_requests r ON r.id=d.rental_id ORDER BY d.created_at DESC LIMIT 100`).all();
+   FROM disclosure_requests d JOIN rental_requests r ON r.id=d.rental_id LEFT JOIN partners p ON p.id=r.partner_id ORDER BY d.created_at DESC LIMIT 100`).all();
   return Response.json({cases:rows.results});
  }
  if(path==='/api/admin/overdue'&&req.method==='GET'){
