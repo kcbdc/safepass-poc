@@ -1214,3 +1214,15 @@ body.partner-mode #app > nav.partner-bottom > button.active,body.partner-mode #a
 .partner-verify-card .action>button {width:100%!important;min-width:0!important;max-width:none!important;margin:0!important;padding:13px 16px!important;min-height:49px!important;line-height:1.5!important;box-sizing:border-box!important}
 .partner-verify-card #partnerLive {margin:14px 0 6px!important;line-height:1.7!important;word-break:keep-all!important}
 @media(max-width:480px){#adminRentalLookup .admin-rental-search{gap:10px!important}#adminRentalLookup .admin-rental-search button{flex:1!important;min-width:0!important}#adminRentalResults .admin-rental-entry{padding:17px 16px 19px!important}#adminRentalResults .admin-rental-buttons{gap:12px!important}#adminRentalResults .admin-rental-buttons button{font-size:clamp(12px,3.3vw,14px)!important;padding:10px 9px!important}.partner-verify-card .action{gap:12px!important}.partner-verify-card .action>button{font-size:clamp(12px,3.4vw,15px)!important;padding:12px 8px!important}}
+
+/* v1.7.4 — consistent management list pagination and reviewer controls */
+.admin-rental-entry[hidden],.partner-entry[hidden]{display:none!important}
+.list-expand-controls{display:flex;justify-content:center;margin:18px 0 8px;padding:8px 0;}
+.list-expand-controls button{min-height:42px;padding:10px 24px;max-width:340px;width:100%;border-radius:14px;}
+#adminPartnerList,#adminCaseList,#adminRentalResults{display:flex;flex-direction:column;gap:12px;}
+#adminPartnerList>.partner-entry,#adminCaseList>.partner-entry,#adminRentalResults>.admin-rental-entry{margin:0;}
+.partner-entry-masked-key{display:block;overflow-wrap:anywhere;color:var(--muted,#6a7988);font-size:.85em;margin-top:5px;}
+.reviewer-check-row{display:flex;align-items:center;gap:14px;margin:12px 0 10px;flex-wrap:wrap;}
+.reviewer-check-row button{width:auto;min-height:42px;max-width:260px;padding:10px 18px;}
+#reviewerCheckStatus{font-size:.9rem;color:#52736f;}
+@media(max-width:650px){.reviewer-check-row button{width:100%;max-width:none}.list-expand-controls{margin:14px 0 6px}}
