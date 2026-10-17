@@ -1250,3 +1250,24 @@ body.partner-mode #app > nav.partner-bottom > button.active,body.partner-mode #a
 .partner-mode .app-header .wordmark .safe-brand-logo{height:35px;max-width:min(65vw,375px)}
 @media(min-width:1024px){.app-header .wordmark .safe-brand-logo{height:46px;max-width:360px}.partner-mode .app-header .wordmark .safe-brand-logo{height:43px;max-width:420px}}
 @media(max-width:390px){.app-header .wordmark .safe-brand-logo{height:32px;max-width:54vw}.partner-mode .app-header .wordmark .safe-brand-logo{height:29px;max-width:64vw}}
+
+/* v1.8.1 inline SVG wordmark logos */
+.app-header .wordmark{display:inline-flex!important;align-items:center!important;min-width:0!important;flex-shrink:1!important;line-height:1!important}
+.sp-brand{display:inline-flex;align-items:center;gap:12px;min-width:0;max-width:100%}
+.sp-brand-icon{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto}
+.sp-brand-icon svg{display:block;width:auto;height:42px;overflow:visible}
+.sp-brand-wordmark{display:inline-flex;align-items:baseline;gap:.16em;min-width:0;white-space:nowrap;letter-spacing:-.045em;font-family:Arial,"Helvetica Neue",Helvetica,sans-serif}
+.sp-brand-primary,.sp-brand-secondary{font-weight:900;color:#0d2f87;text-rendering:geometricPrecision}
+.sp-brand--header.sp-brand--user .sp-brand-primary{font-size:clamp(31px,3vw,38px)}
+.sp-brand--header.sp-brand--partner .sp-brand-primary{font-size:clamp(30px,2.8vw,37px)}
+.sp-brand--header .sp-brand-secondary{font-size:clamp(24px,2.25vw,31px);margin-left:.02em}
+.sp-brand--success{gap:10px;justify-content:center}
+.sp-brand--success .sp-brand-icon svg{height:40px}
+.sp-brand--success .sp-brand-primary{font-size:34px}
+.sp-brand--success .sp-brand-secondary{font-size:28px}
+.partner-mode .sp-brand{gap:11px}
+@media (max-width:720px){.sp-brand{gap:10px}.sp-brand-icon svg{height:36px}.sp-brand--header.sp-brand--user .sp-brand-primary{font-size:clamp(27px,6vw,34px)}.sp-brand--header.sp-brand--partner .sp-brand-primary{font-size:clamp(24px,5.6vw,31px)}.sp-brand--header .sp-brand-secondary{font-size:clamp(20px,4.8vw,27px)}}
+@media (max-width:430px){.sp-brand{gap:8px}.sp-brand-icon svg{height:31px}.sp-brand--header.sp-brand--user .sp-brand-primary{font-size:clamp(23px,6.9vw,29px)}.sp-brand--header.sp-brand--partner .sp-brand-primary{font-size:clamp(21px,6.2vw,25px)}.sp-brand--header .sp-brand-secondary{font-size:clamp(16px,4.9vw,21px)}.sp-brand--success .sp-brand-primary{font-size:29px}.sp-brand--success .sp-brand-secondary{font-size:24px}}
+.safepass-success-card .sp-brand{margin-bottom:2px}
+.safepass-success-card .sp-brand-icon svg{height:38px}
+.safepass-success-card .sp-brand-wordmark{justify-content:center}
