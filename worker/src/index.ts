@@ -273,14 +273,32 @@ export default {async fetch(req:Request,env:Env):Promise<Response>{
   return Response.json({simulation:true,source:'FICTIONAL_TEST_DATA',case_id:caseId,rental_id:row.rental_id,profile,notice:'가상 신원정보입니다. 실제 모바일신분증과 연결되지 않습니다.'});
  }
  if(path==='/api/partner/register'){
-  const ip=req.headers.get('CF-Connecting-IP')||'unavailable';
-  if(!await checkLimit(env.DB,'register:'+await sha(ip),3,60))return fail('등록 요청 제한: 1시간 후 다시 시도하세요',429);
   const id=safeText(x.partner_id,50),name=safeText(x.name,100);
-  if(!/^[a-z0-9-]{4,50}$/.test(id)||name.length<2)return fail('Partner ID and name required');
-  // Generate a unique 256-bit secret on the server; never persist plaintext.
+  if(!/^[a-z0-9-]{4,50}$/.test(id)||name.length<2)return fail('대여처 ID(영문 소문자·숫자·하이픈 4~50자)와 대여처 이름(2자 이상)을 확인하세요.');
+  // Detect duplicate IDs before consuming the hourly registration allowance.
+  const existing=await env.DB.prepare('SELECT id FROM partners WHERE id=?').bind(id).first<{id:string}>();
+  if(existing)return fail('이미 등록된 대여처 ID입니다. 기존 대여처 ID·접근 키로 조회하세요. 키를 잃어버렸다면 통합관리 → 대여처 현황·중지 관리에서 접근 키 초기화를 이용하세요.',409);
+  const ip=req.headers.get('CF-Connecting-IP')||'unavailable';
+  const bucket='register:'+await sha(ip),start=new Date(Date.now()-3600000).toISOString();
+  // Return real sliding-window wait time: the oldest of the ten recent registrations expires first.
+  const history=await env.DB.prepare('SELECT at FROM request_limits WHERE bucket_key=? AND at>? ORDER BY at ASC LIMIT 10').bind(bucket,start).all<{at:string}>();
+  if((history.results?.length||0)>=10){
+   const oldest=Date.parse(history.results![0].at),remainingSeconds=Math.max(1,Math.ceil((oldest+3600000-Date.now())/1000));
+   const minutes=Math.ceil(remainingSeconds/60);
+   return new Response(JSON.stringify({error:`대여처 등록은 동일 네트워크에서 시간당 10회까지 가능합니다. 약 ${minutes}분 후 다시 시도하세요.`,retry_after_seconds:remainingSeconds,remaining_minutes:minutes,limit:10,window_minutes:60}),{status:429,headers:{'Content-Type':'application/json; charset=utf-8','Retry-After':String(remainingSeconds)}});
+  }
   const secret=hex(crypto.getRandomValues(new Uint8Array(32)).buffer);
-  await env.DB.prepare('INSERT INTO partners(id,name,key_hash,status,created_at) VALUES(?,?,?,?,?)').bind(id,name,await sha(secret),'APPROVED',now()).run();
-  await audit(env.DB,'PARTNER_SELF_REGISTERED',null,id+'; PoC auto-activated, key verification still required');return Response.json({partner_id:id,status:'APPROVED',partner_key:secret,notice:'PoC 등록 즉시 이용 가능 · 미반납 가상 신원 열람은 별도 2단계 승인'});
+  try{
+   await env.DB.prepare('INSERT INTO partners(id,name,key_hash,status,created_at) VALUES(?,?,?,?,?)').bind(id,name,await sha(secret),'APPROVED',now()).run();
+  }catch(e){
+   // Another registration may have won a race for this ID.
+   const duplicate=await env.DB.prepare('SELECT id FROM partners WHERE id=?').bind(id).first<{id:string}>();
+   if(duplicate)return fail('이미 등록된 대여처 ID입니다. 통합관리에서 기존 대여처를 조회하거나 접근 키를 초기화하세요.',409);
+   throw e;
+  }
+  await env.DB.prepare('INSERT INTO request_limits(id,bucket_key,at) VALUES(?,?,?)').bind(crypto.randomUUID(),bucket,now()).run();
+  await audit(env.DB,'PARTNER_SELF_REGISTERED',null,id+'; PoC auto-activated, key verification still required');
+  return Response.json({partner_id:id,status:'APPROVED',partner_key:secret,notice:'PoC 등록 즉시 이용 가능 · 미반납 가상 신원 열람은 별도 2단계 승인'});
  }
  if(!device||! /^[a-f0-9-]{36}$/i.test(device))return fail('Demo device ID required',401);
  if(path==='/api/partner/rentals'&&req.method==='POST'){
