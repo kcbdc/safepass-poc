@@ -1271,3 +1271,11 @@ body.partner-mode #app > nav.partner-bottom > button.active,body.partner-mode #a
 .safepass-success-card .sp-brand{margin-bottom:2px}
 .safepass-success-card .sp-brand-icon svg{height:38px}
 .safepass-success-card .sp-brand-wordmark{justify-content:center}
+
+/* v1.8.3: user's supplied icon replaces SVG */
+.sp-brand-icon .sp-brand-source{display:block!important;width:44px!important;height:44px!important;max-width:none!important;object-fit:contain!important}
+.sp-brand--success .sp-brand-icon .sp-brand-source{width:52px!important;height:52px!important}
+@media(max-width:720px){.sp-brand-icon .sp-brand-source{width:39px!important;height:39px!important}}
+@media(max-width:430px){.sp-brand-icon .sp-brand-source{width:34px!important;height:34px!important}}
+.admin-load-error{margin:16px 0;padding:16px;border:1px solid #f0c7b7;border-radius:14px;background:#fff7f3;line-height:1.65;color:#883d26}
+.admin-load-error button{margin-top:10px}
